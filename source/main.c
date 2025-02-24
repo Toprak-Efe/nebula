@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
+#include <cglm/cglm.h>
 #include <GL/gl.h>
 
 #include <pthread.h>
@@ -68,9 +69,11 @@ int main(int argc, char **argv) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cartesian_pose_t), (void *)0);
     glEnableVertexAttribArray(0);
 
-
+    mat4 camera;
+    glm_perspective(90.0, 1.0, 0.01, 10.0, &camera);
     glUseProgram(star_shader->shader_id);
-
+    glUniformMatrix4fv(star_shader->transform_id, 1, GL_FALSE, &camera[0][0]);
+    
     /* Render Loop */
     int running = 1;
     SDL_Event event;
@@ -89,7 +92,8 @@ int main(int argc, char **argv) {
         SDL_GL_SwapWindow(window->window);
     }
     /* Main Thread End */
-    
+
+    logprint(LOG_INFO, "Main thread ending.");
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     free(stars);

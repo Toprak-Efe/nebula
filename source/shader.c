@@ -5,11 +5,12 @@ shader_t *vertex_shader = NULL;
 shader_t *fragment_shader = NULL;
 
 void initialize_shaders() {
+    logprint(LOG_INFO, "Initializing shaders.");
     star_shader = malloc(sizeof(shader_t));
     vertex_shader = malloc(sizeof(shader_t));
     fragment_shader = malloc(sizeof(shader_t));
     if (!star_shader || !vertex_shader ||!fragment_shader) {
-        logprint(LOG_ERROR, "Failed to allocate memory for shaders.\n");
+        logprint(LOG_ERROR, "Failed to allocate memory for shaders.");
         exit(1);
     }
     star_shader->transform_id = -1;
@@ -29,12 +30,12 @@ void initialize_shaders() {
     memcpy(fragment_source_str, fragment_shader_start, fragment_shader_size);
     fragment_source_str[fragment_shader_size] = '\0';
 
-    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+    GLuint vs = glCreateShader((GLenum) GL_VERTEX_SHADER);
     glShaderSource(vs, 1, &vertex_source_str, NULL);
     glCompileShader(vs);
     vertex_shader->shader_id = vs;
 
-    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+    GLuint fs = glCreateShader((GLenum) GL_FRAGMENT_SHADER);
     glShaderSource(fs, 1, &fragment_source_str, NULL);
     glCompileShader(fs);
     fragment_shader->shader_id = fs;
@@ -43,13 +44,13 @@ void initialize_shaders() {
     glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
     if (!success) {
         char info_log[512];
-        glGetShaderInfoLog(vs, sizeof(info_log), NULL, log);
+        glGetShaderInfoLog(vs, sizeof(info_log), NULL, info_log);
         logprint(LOG_ERROR, "Vertex shader failed to compile: %s", info_log);
     }
     glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
     if (!success) {
         char info_log[512];
-        glGetShaderInfoLog(fs, sizeof(info_log), NULL, log);
+        glGetShaderInfoLog(fs, sizeof(info_log), NULL, info_log);
         logprint(LOG_ERROR, "Fragment shader failed to compile: %s", info_log);
     }
 
@@ -60,9 +61,11 @@ void initialize_shaders() {
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (!success) {
         char info_log[512];
-        glGetShaderInfoLog(fs, sizeof(info_log), NULL, log);
+        glGetShaderInfoLog(fs, sizeof(info_log), NULL, info_log);
         logprint(LOG_ERROR, "Program failed to link: %s", info_log);
     }
+    star_shader->shader_id = program;
+    star_shader->transform_id = glGetUniformLocation(program, "transformation");
 
     free(vertex_source_str);
     free(fragment_source_str);
@@ -70,6 +73,7 @@ void initialize_shaders() {
 }
 
 void uninitialize_shaders() {
+    logprint(LOG_INFO, "Uninitializing shaders.");
     if (vertex_shader) {
         if (glIsProgram(vertex_shader->shader_id)) {
             glDeleteProgram(vertex_shader->shader_id);
