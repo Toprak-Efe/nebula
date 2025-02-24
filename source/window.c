@@ -32,7 +32,7 @@ void window_init() {
         "Astronomy",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        512, 512, 
+        1920, 1080, 
         SDL_WINDOW_OPENGL
     );
     if (!window->window) {

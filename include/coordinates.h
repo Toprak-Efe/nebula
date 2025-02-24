@@ -1,8 +1,10 @@
 #ifndef COORDINATES_h
 #define COORDINATES_h
 
-#include <stdint.h>
+#include <cglm/cglm.h>
 #include <GL/gl.h>
+
+#include <stdint.h>
 #include <math.h>
 
 typedef struct {
@@ -10,7 +12,7 @@ typedef struct {
 } cartesian_pose_t;
 
 typedef struct {
-    GLfloat ra, dec;
+    GLfloat r, ra, dec;
 } equatorial_pose_t;
 
 void equatorial_to_cartesian(const equatorial_pose_t *equatorial, cartesian_pose_t *cartesian);

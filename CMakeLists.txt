@@ -13,6 +13,7 @@ set(SOURCES
     source/log.c
     source/coordinates.c
     source/functions.c
+    source/camera.c
     source/window.c
     source/shader.c
 )
