@@ -18,9 +18,9 @@ void initialize_shaders() {
     fragment_shader->transform_id = -1;
 
     const char *vertex_shader_start = (char *)_binary__vertex_start;
-    size_t vertex_shader_size = (size_t)_binary__vertex_size;
+    size_t vertex_shader_size = (size_t) (_binary__vertex_end - _binary__vertex_start);
     const char *fragment_shader_start = (char *)_binary__fragment_start;
-    size_t fragment_shader_size = (size_t)_binary__fragment_size;
+    size_t fragment_shader_size = (size_t) (_binary__fragment_end - _binary__fragment_start);
 
     char *vertex_source_str = malloc(sizeof(char) * vertex_shader_size + 1);
     memcpy(vertex_source_str, vertex_shader_start, vertex_shader_size);
@@ -31,12 +31,12 @@ void initialize_shaders() {
     fragment_source_str[fragment_shader_size] = '\0';
 
     GLuint vs = glCreateShader((GLenum) GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &vertex_source_str, NULL);
+    glShaderSource(vs, 1, (const GLchar * const *)& vertex_source_str, NULL);
     glCompileShader(vs);
     vertex_shader->shader_id = vs;
 
     GLuint fs = glCreateShader((GLenum) GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &fragment_source_str, NULL);
+    glShaderSource(fs, 1, (const GLchar * const *) &fragment_source_str, NULL);
     glCompileShader(fs);
     fragment_shader->shader_id = fs;
     
