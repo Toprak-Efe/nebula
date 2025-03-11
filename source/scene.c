@@ -13,27 +13,32 @@ void uninitialize_scene(scene_t *scene) {
 }
 
 void process_input(scene_t *scene, SDL_Event *event) {
+    static uint8_t mouse_down_state = false;
+    equatorial_pose_t pivot_point;
     int lr, ud;
+    int x, y;
+    int w, h;
     vec3 delta = {0.0f, 0.0f, 0.0f};
     switch (event->type) {
     case SDL_MOUSEMOTION:
-        lr = event->motion.xrel;
-        ud = -event->motion.yrel;
-        g_main_scene->camera.direction.dec -= ud / 5.0f;
-        g_main_scene->camera.direction.ra -= lr / 5.0f;
-        if (g_main_scene->camera.direction.dec > 45.0f) {
-            g_main_scene->camera.direction.dec = 45.0f;
-        }
-        if (g_main_scene->camera.direction.dec < -45.0f) {
-            g_main_scene->camera.direction.dec = -45.0f;
-        }
-        if (g_main_scene->camera.direction.ra > 360.0f) {
-            g_main_scene->camera.direction.ra -= 360.0f;
-        }
-        if (g_main_scene->camera.direction.ra < -360.0f) {
-            g_main_scene->camera.direction.ra += 360.0f;
+        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON_LMASK) {
+            equatorial_pose_t cursor_direction;
+            camera_raycast(&g_main_scene->camera, &cursor_direction, x, y);            
+            g_main_scene->camera.direction.dec += pivot_point.dec - cursor_direction.dec*(2*GLM_PI*g_main_scene->camera.arclength/360.0f);
+            g_main_scene->camera.direction.ra += (pivot_point.ra - cursor_direction.ra)*(2*GLM_PI*g_main_scene->camera.arclength/360.0f);
+            pivot_point = cursor_direction;
         }
         break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (event->button.button == SDL_BUTTON_LEFT) {
+            mouse_down_state = true;
+            SDL_GetMouseState(&x, &y);
+            camera_raycast(&g_main_scene->camera, &pivot_point, x, y);
+        }
+    case SDL_MOUSEBUTTONUP:
+        if (event->button.button == SDL_BUTTON_LEFT) {
+            mouse_down_state = false;
+        }
     case SDL_KEYDOWN:
         switch (event->key.keysym.sym) {
         case SDLK_w:
@@ -96,8 +101,8 @@ void initialize_main_scene() {
     }
     for (size_t i = 0; i < STARCOUNT; i++) {
         stars[i].r = 1.0f;
-        stars[i].ra = ((float)rand() / (float)RAND_MAX * 360.0f);
-        stars[i].dec = ((float)rand() / (float)RAND_MAX * 360.0f);
+        stars[i].ra = (-90.0f + 180.0f*i/STARCOUNT);
+        stars[i].dec =  ((-90.0f + 180.0f*i/STARCOUNT)*45.05);
     }
     cartesian_pose_t *cartesian = malloc(sizeof(cartesian_pose_t) * STARCOUNT);
     if (!cartesian) {

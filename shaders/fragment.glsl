@@ -6,5 +6,5 @@ out vec4 frag_color;
 
 void main() {
     vec3 color = normalize(vertex_position);
-    frag_color = vec4(color.y, 0.0, 0.3, 1.0);
+    frag_color = vec4(1.0, 1.0, 1.0, 1.0);
 }

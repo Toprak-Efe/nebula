@@ -39,8 +39,28 @@ void camera_move(camera_t *camera, vec3 delta) {
     camera->position.z += output[2];
 }
 
+void camera_raycast(camera_t *camera, equatorial_pose_t *pose, float x, float y) {
+    int w, h;
+    float x_norm = ((float) x / (float) w)*2.0 - 1.0;
+    float y_norm = ((float) y / (float) h)*2.0 - 1.0;
+    SDL_GetWindowSize(g_window->window, &w, &h);
+    vec4 mouse_ray = {x_norm, y_norm, -1.0, 1.0};
+    mat4 perspective_inv;
+    glm_mat4_inv(camera->projection, perspective_inv);
+    vec4 cursor_coords_v4;
+    glm_mat4_mulv(perspective_inv, mouse_ray, cursor_coords_v4);
+    vec3 cursor_coords = {cursor_coords_v4[0], cursor_coords_v4[1], cursor_coords_v4[2]};
+    glm_vec3_normalize(cursor_coords);
+    cartesian_pose_t camera_mouse_direction;
+    camera_mouse_direction.x = cursor_coords[0];
+    camera_mouse_direction.y = cursor_coords[1];
+    camera_mouse_direction.z = cursor_coords[2];
+    equatorial_pose_t cursor_direction;
+    cartesian_to_equatorial(&camera_mouse_direction, pose);
+}
+
 void initialize_camera(camera_t *camera) {
-    camera->arclength = 90.0f;
+    camera->arclength = 15.0f;
     glm_perspective(glm_rad(camera->arclength), 16.0f/9.0f, 0.01f, 1000.0f, camera->projection);
     camera->direction.r = 1.0f;
     camera->direction.ra = 0.0f;

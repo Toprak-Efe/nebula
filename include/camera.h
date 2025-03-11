@@ -2,6 +2,7 @@
 #define CAMERA_H
 
 #include <cglm/cglm.h>
+#include "window.h"
 #include "coordinates.h"
 
 typedef struct {
@@ -16,6 +17,7 @@ extern mat4 axis_remapping_matrix;
 void camera_model_transform(camera_t *camera, mat4 out);
 void camera_view_transform(camera_t *camera, mat4 out);
 void camera_move(camera_t *camera, vec3 delta);
+void camera_raycast(camera_t *camera, equatorial_pose_t *pose, float x, float y);
 void initialize_camera(camera_t *camera);
 void uninitialize_camera(camera_t *camera);
 
