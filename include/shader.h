@@ -19,9 +19,9 @@ extern const unsigned char _binary__fragment_start[];
 extern const unsigned char _binary__fragment_end[];
 extern const unsigned char _binary__fragment_size[];
 
-extern shader_t *star_shader;
-extern shader_t *vertex_shader;
-extern shader_t *fragment_shader;
+extern shader_t *g_star_shader;
+extern shader_t *g_vertex_shader;
+extern shader_t *g_fragment_shader;
 
 void initialize_shaders();
 void uninitialize_shaders();

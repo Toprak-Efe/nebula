@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project(astronomy)
 
-
 ## Start Defining Variables
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -16,6 +15,7 @@ set(SOURCES
     source/camera.c
     source/window.c
     source/shader.c
+    source/scene.c
 )
 ## End Defining Variables
 

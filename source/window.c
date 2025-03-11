@@ -1,15 +1,15 @@
 #include "window.h"
 
-window_t *window = NULL;
+window_t *g_window = NULL;
 
 void window_init() {
-    window = malloc(sizeof(window_t));
-    if (!window) {
+    g_window = malloc(sizeof(window_t));
+    if (!g_window) {
         logprint(LOG_ERROR, "Failed to allocate memory for window");
         exit(1);
     }
-    window->window = NULL;
-    window->context = NULL;
+    g_window->window = NULL;
+    g_window->context = NULL;
 
     logprint(LOG_INFO, "Initializing SDL");
 
@@ -28,20 +28,20 @@ void window_init() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     
-    window->window = SDL_CreateWindow(
+    g_window->window = SDL_CreateWindow(
         "Astronomy",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         1920, 1080, 
         SDL_WINDOW_OPENGL
     );
-    if (!window->window) {
+    if (!g_window->window) {
         logprint(LOG_ERROR, "Failed to create window: %s", SDL_GetError());
         exit(1);
     }
 
-    window->context = SDL_GL_CreateContext(window->window);
-    if (!window->context) {
+    g_window->context = SDL_GL_CreateContext(g_window->window);
+    if (!g_window->context) {
         logprint(LOG_ERROR, "Failed to create OpenGL context: %s", SDL_GetError());
         exit(1);
     }
@@ -59,14 +59,14 @@ void window_init() {
 }
 
 void window_uninit() {
-    if (window) {
-        if (window->context) {
-            SDL_GL_DeleteContext(window->context);
+    if (g_window) {
+        if (g_window->context) {
+            SDL_GL_DeleteContext(g_window->context);
         }
-        if (window->window) {
-            SDL_DestroyWindow(window->window);
+        if (g_window->window) {
+            SDL_DestroyWindow(g_window->window);
         }
-        free(window);
+        free(g_window);
     }
     SDL_Quit();
 }

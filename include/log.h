@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <time.h>
 
-extern FILE *log_file;
-extern struct tm *time_info;
-extern time_t current_time;
+extern FILE *g_log_file;
+extern struct tm *g_time_info;
+extern time_t g_current_time;
 
 typedef enum {
     LOG_INFO,

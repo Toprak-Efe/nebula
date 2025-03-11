@@ -1,9 +1,15 @@
 #include "camera.h"
 
+vec3 anchor_point = {
+    0.0f,
+    0.0f,
+    0.0f
+};
+
 mat4 axis_remapping_matrix = {
     {0.0f, 0.0f,-1.0f, 0.0f},
-    {-1.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f,-1.0f, 0.0f, 0.0f},
+    {-1.0f,0.0f, 0.0f, 0.0f},
+    {0.0f, 1.0f, 0.0f, 0.0f},
     {0.0f, 0.0f, 0.0f, 1.0f}
 };
 
@@ -33,7 +39,7 @@ void camera_move(camera_t *camera, vec3 delta) {
     camera->position.z += output[2];
 }
 
-void camera_init(camera_t *camera) {
+void initialize_camera(camera_t *camera) {
     camera->arclength = 90.0f;
     glm_perspective(glm_rad(camera->arclength), 16.0f/9.0f, 0.01f, 1000.0f, camera->projection);
     camera->direction.r = 1.0f;
@@ -42,4 +48,10 @@ void camera_init(camera_t *camera) {
     camera->position.x = 0.0f;
     camera->position.y = 0.0f;
     camera->position.z = 0.0f;
+}
+
+void uninitialize_camera(camera_t *camera) {
+    if (camera) {
+        free(camera);
+    }
 }

@@ -14,11 +14,9 @@ typedef struct {
 extern mat4 axis_remapping_matrix;
 
 void camera_model_transform(camera_t *camera, mat4 out);
-
 void camera_view_transform(camera_t *camera, mat4 out);
-
 void camera_move(camera_t *camera, vec3 delta);
-
-void camera_init(camera_t *camera);
+void initialize_camera(camera_t *camera);
+void uninitialize_camera(camera_t *camera);
 
 #endif // CAMERA_H

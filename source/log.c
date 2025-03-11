@@ -1,12 +1,12 @@
 #include "log.h"
 
-FILE *log_file = NULL;
-struct tm *time_info = NULL;
-time_t current_time = 0;
+FILE *g_log_file = NULL;
+struct tm *g_time_info = NULL;
+time_t g_current_time = 0;
 
 void log_init() {
-    log_file = fopen("log.txt", "a+");
-    if (log_file == NULL) {
+    g_log_file = fopen("log.txt", "a+");
+    if (g_log_file == NULL) {
         fprintf(stderr, "Failed to open log file\n");
         exit(1);
     }
@@ -14,49 +14,49 @@ void log_init() {
 }
 
 void log_uninit() {
-    fclose(log_file);
+    fclose(g_log_file);
 }
 
 void logprint(log_level level, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    time(&current_time);
-    time_info = localtime(&current_time);
-    fprintf(log_file, "[%d-%d-%d %d:%d:%d] ", 
-        time_info->tm_year + 1900,
-        time_info->tm_mon + 1,
-        time_info->tm_mday,
-        time_info->tm_hour,
-        time_info->tm_min,
-        time_info->tm_sec
+    time(&g_current_time);
+    g_time_info = localtime(&g_current_time);
+    fprintf(g_log_file, "[%d-%d-%d %d:%d:%d] ", 
+        g_time_info->tm_year + 1900,
+        g_time_info->tm_mon + 1,
+        g_time_info->tm_mday,
+        g_time_info->tm_hour,
+        g_time_info->tm_min,
+        g_time_info->tm_sec
     );
     switch (level) {
         case LOG_INFO:
-            fprintf(log_file, "INFO: ");
+            fprintf(g_log_file, "INFO: ");
             break;
         case LOG_WARN:
-            fprintf(log_file, "WARN: ");
+            fprintf(g_log_file, "WARN: ");
             break;
         case LOG_DEBUG:
-            fprintf(log_file, "DEBUG: ");
+            fprintf(g_log_file, "DEBUG: ");
             break;
         case LOG_ERROR:
-            fprintf(log_file, "ERROR: ");
+            fprintf(g_log_file, "ERROR: ");
             break;
     }
-    vfprintf(log_file, fmt, args);
+    vfprintf(g_log_file, fmt, args);
     va_end(args);
-    fprintf(log_file, "\n");
+    fprintf(g_log_file, "\n");
 
     #ifdef DEBUG
     va_start(args, fmt);
     fprintf(stdout, "[%d-%d-%d %d:%d:%d] ", 
-        time_info->tm_year + 1900,
-        time_info->tm_mon + 1,
-        time_info->tm_mday,
-        time_info->tm_hour,
-        time_info->tm_min,
-        time_info->tm_sec
+        g_time_info->tm_year + 1900,
+        g_time_info->tm_mon + 1,
+        g_time_info->tm_mday,
+        g_time_info->tm_hour,
+        g_time_info->tm_min,
+        g_time_info->tm_sec
     );
     switch (level) {
         case LOG_INFO:

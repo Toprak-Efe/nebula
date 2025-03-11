@@ -1,21 +1,21 @@
 #include "shader.h"
 
-shader_t *star_shader = NULL;
-shader_t *vertex_shader = NULL;
-shader_t *fragment_shader = NULL;
+shader_t *g_star_shader = NULL;
+shader_t *g_vertex_shader = NULL;
+shader_t *g_fragment_shader = NULL;
 
 void initialize_shaders() {
     logprint(LOG_INFO, "Initializing shaders.");
-    star_shader = malloc(sizeof(shader_t));
-    vertex_shader = malloc(sizeof(shader_t));
-    fragment_shader = malloc(sizeof(shader_t));
-    if (!star_shader || !vertex_shader ||!fragment_shader) {
+    g_star_shader = malloc(sizeof(shader_t));
+    g_vertex_shader = malloc(sizeof(shader_t));
+    g_fragment_shader = malloc(sizeof(shader_t));
+    if (!g_star_shader || !g_vertex_shader ||!g_fragment_shader) {
         logprint(LOG_ERROR, "Failed to allocate memory for shaders.");
         exit(1);
     }
-    star_shader->transform_id = -1;
-    vertex_shader->transform_id = -1;
-    fragment_shader->transform_id = -1;
+    g_star_shader->transform_id = -1;
+    g_vertex_shader->transform_id = -1;
+    g_fragment_shader->transform_id = -1;
 
     const char *vertex_shader_start = (char *)_binary__vertex_start;
     size_t vertex_shader_size = (size_t) (_binary__vertex_end - _binary__vertex_start);
@@ -33,12 +33,12 @@ void initialize_shaders() {
     GLuint vs = glCreateShader((GLenum) GL_VERTEX_SHADER);
     glShaderSource(vs, 1, (const GLchar * const *)& vertex_source_str, NULL);
     glCompileShader(vs);
-    vertex_shader->shader_id = vs;
+    g_vertex_shader->shader_id = vs;
 
     GLuint fs = glCreateShader((GLenum) GL_FRAGMENT_SHADER);
     glShaderSource(fs, 1, (const GLchar * const *) &fragment_source_str, NULL);
     glCompileShader(fs);
-    fragment_shader->shader_id = fs;
+    g_fragment_shader->shader_id = fs;
     
     GLint success;
     glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
@@ -64,8 +64,8 @@ void initialize_shaders() {
         glGetShaderInfoLog(fs, sizeof(info_log), NULL, info_log);
         logprint(LOG_ERROR, "Program failed to link: %s", info_log);
     }
-    star_shader->shader_id = program;
-    star_shader->transform_id = glGetUniformLocation(program, "transformation");
+    g_star_shader->shader_id = program;
+    g_star_shader->transform_id = glGetUniformLocation(program, "transformation");
 
     free(vertex_source_str);
     free(fragment_source_str);
@@ -74,22 +74,22 @@ void initialize_shaders() {
 
 void uninitialize_shaders() {
     logprint(LOG_INFO, "Uninitializing shaders.");
-    if (vertex_shader) {
-        if (glIsProgram(vertex_shader->shader_id)) {
-            glDeleteProgram(vertex_shader->shader_id);
+    if (g_vertex_shader) {
+        if (glIsProgram(g_vertex_shader->shader_id)) {
+            glDeleteProgram(g_vertex_shader->shader_id);
         }
-        free(vertex_shader);
+        free(g_vertex_shader);
     }
-    if (fragment_shader) {
-        if (glIsProgram(fragment_shader->shader_id)) {
-            glDeleteProgram(fragment_shader->shader_id);
+    if (g_fragment_shader) {
+        if (glIsProgram(g_fragment_shader->shader_id)) {
+            glDeleteProgram(g_fragment_shader->shader_id);
         }
-        free(fragment_shader);
+        free(g_fragment_shader);
     }
-    if (star_shader) {
-        if (glIsProgram(star_shader->shader_id)) {
-            glDeleteProgram(star_shader->shader_id);
+    if (g_star_shader) {
+        if (glIsProgram(g_star_shader->shader_id)) {
+            glDeleteProgram(g_star_shader->shader_id);
         }
-        free(star_shader);
+        free(g_star_shader);
     }
 }

@@ -11,7 +11,7 @@ typedef struct {
     SDL_GLContext context;
 } window_t;
 
-extern window_t *window;
+extern window_t *g_window;
 
 void window_init();
 void window_uninit();
