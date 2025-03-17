@@ -12,6 +12,8 @@
 typedef struct {
     camera_t camera;
     GLuint vao, vbo;
+    vec3 pivot_pose;
+    GLuint pvao, pvbo;
 } scene_t;
 
 extern scene_t *g_main_scene;

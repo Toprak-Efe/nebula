@@ -9,7 +9,8 @@
 
 typedef struct {
     GLuint shader_id;
-    GLint transform_id;
+    GLint u_trans_id;
+    GLint u_color_id;
 } shader_t;
 
 extern const unsigned char _binary__vertex_start[];

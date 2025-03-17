@@ -13,15 +13,33 @@ void uninitialize_scene(scene_t *scene) {
 }
 
 void process_input(scene_t *scene, SDL_Event *event) {
-    vec3 pivot_p;
     uint8_t pivot = false;
+    vec4 pivot_pose;
     int x, y;
     int w, h;
     vec3 vector = {0.0f, 0.0f, 0.0f};
+    vec3 v_rotation;
+    mat4 rotation;
     switch (event->type) {
     case SDL_MOUSEMOTION:
-        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON_LMASK & pivot) {
-            /* Pivot the pivot point. */
+        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON_LMASK) {
+            SDL_GetWindowSize(g_window->window, &w, &h);
+            float x_norm = ((float) x / (float) w)*2.0 - 1.0;
+            float y_norm = ((float) y / (float) h)*2.0 - 1.0;
+            camera_inverse(&g_main_scene->camera, pivot_pose, x_norm, y_norm);            
+            cartesian_pose_t c_mouse, c_pivot;
+            equatorial_pose_t e_mouse, e_pivot;
+            c_mouse.x = pivot_pose[0];
+            c_mouse.y = pivot_pose[1];
+            c_mouse.z = pivot_pose[2];
+            c_pivot.x = scene->pivot_pose[0];
+            c_pivot.y = scene->pivot_pose[1];
+            c_pivot.z = scene->pivot_pose[2];
+            cartesian_to_equatorial(&c_mouse, &e_mouse);
+            cartesian_to_equatorial(&c_pivot, &e_pivot);
+            //scene->camera.direction.dec -= e_pivot.dec - e_mouse.dec;
+            scene->camera.direction.ra -= e_pivot.ra - e_mouse.ra;
+            logprint(LOG_DEBUG, "Camera movement.");
         }
         break;
     case SDL_MOUSEBUTTONDOWN:
@@ -30,8 +48,10 @@ void process_input(scene_t *scene, SDL_Event *event) {
             SDL_GetWindowSize(g_window->window, &w, &h);
             float x_norm = ((float) x / (float) w)*2.0 - 1.0;
             float y_norm = ((float) y / (float) h)*2.0 - 1.0;
-            camera_inverse(&g_main_scene->camera, pivot_p, x_norm, y_norm);
-            pivot = true;
+            camera_inverse(&g_main_scene->camera, pivot_pose, x_norm, y_norm);
+            scene->pivot_pose[0] = pivot_pose[0];
+            scene->pivot_pose[1] = pivot_pose[1];
+            scene->pivot_pose[2] = pivot_pose[2];
         }
         break;
     case SDL_MOUSEBUTTONUP:
@@ -40,19 +60,18 @@ void process_input(scene_t *scene, SDL_Event *event) {
         }
         break;
     case SDL_MOUSEWHEEL:
-        logprint(LOG_INFO, "Mouse wheel.");
-        scene->camera.arclength += event->wheel.y;
+        scene->camera.arclength -= (event->wheel.preciseY);
         if (scene->camera.arclength < 5.0f) {
             scene->camera.arclength = 5.0f;
         }
-        if (scene->camera.arclength > 90.0f) {
-            scene->camera.arclength = 90.0f;
+        if (scene->camera.arclength > 180.0f) {
+            scene->camera.arclength = 180.0f;
         }
         camera_project(&scene->camera);
         break;
     case SDL_KEYDOWN:
         switch (event->key.keysym.sym) {
-#ifdef DEBUG
+#ifdef CAMERA_MOVEMENT_CONTROLS
         case SDLK_w:
             vector[2] = -0.01f;
             camera_move(&g_main_scene->camera, vector);
@@ -75,7 +94,7 @@ void process_input(scene_t *scene, SDL_Event *event) {
             g_main_scene->camera.position.z = 0.0f;
             break;
 #endif
-#ifndef DEBUG
+#ifndef CAMERA_MOVEMENT_CONTROLS
         case SDLK_ESCAPE:
             initialize_camera(&g_main_scene->camera);
             break;
@@ -93,14 +112,32 @@ void highlight_pivot(vec3 pose) {
 }
 
 void draw_scene(scene_t *scene) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram(g_star_shader->shader_id); 
+    
     mat4 view_transform, final_transform;
     camera_view_transform(&scene->camera, view_transform);
     glm_mat4_mul(scene->camera.projection, view_transform, final_transform);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUniformMatrix4fv(g_star_shader->u_trans_id, 1, GL_FALSE, &final_transform[0][0]);
+    glUniform3f(g_star_shader->u_color_id, 1.0, 1.0, 1.0);
+    
     glBindVertexArray(scene->vao);
-    glUseProgram(g_star_shader->shader_id);
-    glUniformMatrix4fv(g_star_shader->transform_id, 1, GL_FALSE, &final_transform[0][0]);
+    glPointSize(2.0);
     glDrawArrays(GL_POINTS, 0, STARCOUNT);
+
+    mat4 model_transform;
+    glm_mat4_identity(model_transform);
+    glm_translate(model_transform, scene->pivot_pose);
+    glm_mat4_mul(final_transform, model_transform, final_transform);
+
+    glUniformMatrix4fv(g_star_shader->u_trans_id, 1, GL_FALSE, &final_transform[0][0]);
+    glUniform3f(g_star_shader->u_color_id, 0.0, 1.0, 0.0);
+
+    glBindVertexArray(scene->pvao);
+    glPointSize(8.0);
+    glDrawArrays(GL_POINTS, 0, 1);
+
     SDL_GL_SwapWindow(g_window->window);
 }
 
@@ -111,7 +148,7 @@ void adjust_scene(scene_t *scene) {
 }
 
 void initialize_main_scene() {
-    g_main_scene = malloc(sizeof(scene_t));
+    g_main_scene = calloc(1, sizeof(scene_t));
     if (!g_main_scene) {
         logprint(LOG_ERROR, "Failed to allocate memory for the main scene");
         exit(1);
@@ -149,18 +186,26 @@ void initialize_main_scene() {
         equatorial_to_cartesian(&stars[i], &cartesian[i]);
     }
 
-    GLuint vao, vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cartesian_pose_t) * STARCOUNT, cartesian, GL_STATIC_DRAW);
-    
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    GLuint vao[2], vbo[2];
+    glGenBuffers(2, vbo);
+    glGenVertexArrays(2, vao);
 
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cartesian_pose_t) * STARCOUNT, cartesian, GL_STATIC_DRAW);
+    glBindVertexArray(vao[0]);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cartesian_pose_t), (void *)0);
-    g_main_scene->vao = vao;
-    g_main_scene->vbo = vbo;
+    g_main_scene->vao = vao[0];
+    g_main_scene->vbo = vbo[0];
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    GLfloat pivot_star[3] = {0.0f, 0.0f, 0.0f};
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cartesian_pose_t), pivot_star, GL_STATIC_DRAW);
+    glBindVertexArray(vao[1]);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(cartesian_pose_t), (void *)0);
+    g_main_scene->pvao = vao[1];
+    g_main_scene->pvbo = vbo[1];
 
     initialize_camera(&g_main_scene->camera);
     free(stars);

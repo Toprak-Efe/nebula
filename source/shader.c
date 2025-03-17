@@ -15,10 +15,14 @@ void initialize_shaders() {
         logprint(LOG_ERROR, "Failed to allocate memory for shaders.");
         exit(1);
     }
-    g_star_shader->transform_id = -1;
-    g_vertex_shader->transform_id = -1;
-    g_geometry_shader->transform_id = -1;
-    g_fragment_shader->transform_id = -1;
+    g_star_shader->u_trans_id = -1;
+    g_star_shader->u_color_id = -1;
+    g_vertex_shader->u_trans_id = -1;
+    g_vertex_shader->u_color_id = -1;
+    g_geometry_shader->u_trans_id = -1;
+    g_geometry_shader->u_color_id = -1;
+    g_fragment_shader->u_trans_id = -1;
+    g_fragment_shader->u_color_id = -1;
 
     const char *vertex_shader_start = (char *)_binary__vertex_start;
     size_t vertex_shader_size = (size_t) (_binary__vertex_end - _binary__vertex_start);
@@ -86,7 +90,8 @@ void initialize_shaders() {
         logprint(LOG_ERROR, "Program failed to link: %s", info_log);
     }
     g_star_shader->shader_id = program;
-    g_star_shader->transform_id = glGetUniformLocation(program, "transformation");
+    g_star_shader->u_trans_id = glGetUniformLocation(program, "transformation");
+    g_star_shader->u_color_id = glGetUniformLocation(program, "color");
 
     free(vertex_source_str);
     free(fragment_source_str);
@@ -100,6 +105,12 @@ void uninitialize_shaders() {
             glDeleteProgram(g_vertex_shader->shader_id);
         }
         free(g_vertex_shader);
+    }
+    if (g_geometry_shader) {
+        if (glIsProgram(g_geometry_shader->shader_id)) {
+            glDeleteProgram(g_geometry_shader->shader_id);
+        }
+        free(g_geometry_shader);
     }
     if (g_fragment_shader) {
         if (glIsProgram(g_fragment_shader->shader_id)) {

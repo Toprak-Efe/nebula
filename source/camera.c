@@ -2,7 +2,7 @@
 
 void camera_model_transform(camera_t *camera, mat4 out) {
     mat4 m_rotation, m_transform;
-    vec3 v_rotation = {0.0f, -glm_rad(camera->direction.dec), glm_rad(camera->direction.ra)};
+    vec3 v_rotation = {glm_rad(camera->direction.dec), -glm_rad(camera->direction.ra), 0.0f};
     vec4 v_transform = {camera->position.x, camera->position.y, camera->position.z, 0.0f};
     glm_euler_xyz(v_rotation, m_rotation);
     glm_translate_make(m_transform, v_transform);
@@ -69,10 +69,11 @@ void camera_inverse(camera_t *camera, vec4 out, float x, float y) {
     glm_mat4_inv(view_transform, v_inverse_transform);
     glm_mat4_inv(camera->projection, p_inverse_transform);
 
-    vec4 p = {x, y, -0.5, 1.0};
+    vec4 p = {x, y, 0.5, 1.0};
 
     glm_mat4_mulv(p_inverse_transform, p, p);
     glm_mat4_mulv(v_inverse_transform, p, out);
+    out[1] = -out[1];
 }
 
 void camera_project(camera_t *camera) {
