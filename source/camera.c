@@ -75,9 +75,13 @@ void camera_inverse(camera_t *camera, vec4 out, float x, float y) {
     glm_mat4_mulv(v_inverse_transform, p, out);
 }
 
+void camera_project(camera_t *camera) {
+    glm_perspective(glm_rad(camera->arclength), 16.0f/9.0f, 0.01f, 100000.0f, camera->projection);
+}
+
 void initialize_camera(camera_t *camera) {
-    camera->arclength = 15.0f;
-    glm_perspective(glm_rad(camera->arclength), 16.0f/9.0f, 0.01f, 1000.0f, camera->projection);
+    camera->arclength = 90.0f;
+    glm_perspective(glm_rad(camera->arclength), 16.0f/9.0f, 0.01f, 100000.0f, camera->projection);
     camera->direction.r = 1.0f;
     camera->direction.ra = 0.0f;
     camera->direction.dec = 0.0f;

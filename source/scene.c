@@ -39,6 +39,17 @@ void process_input(scene_t *scene, SDL_Event *event) {
             /* Motion animation */
         }
         break;
+    case SDL_MOUSEWHEEL:
+        logprint(LOG_INFO, "Mouse wheel.");
+        scene->camera.arclength += event->wheel.y;
+        if (scene->camera.arclength < 5.0f) {
+            scene->camera.arclength = 5.0f;
+        }
+        if (scene->camera.arclength > 90.0f) {
+            scene->camera.arclength = 90.0f;
+        }
+        camera_project(&scene->camera);
+        break;
     case SDL_KEYDOWN:
         switch (event->key.keysym.sym) {
 #ifdef DEBUG
@@ -106,6 +117,15 @@ void initialize_main_scene() {
         exit(1);
     }
     
+    glPointSize(2.0);
+    glEnable(GL_POINT_SMOOTH);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_POLYGON_SMOOTH);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 

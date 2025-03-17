@@ -20,6 +20,7 @@ set(SOURCES
 ## End Defining Variables
 
 ##  Begin Embedding Shaders
+message(STATUS "Embedding shaders.")
 find_program(OBJCOPY_EXECUTABLE objcopy)
 if(NOT OBJCOPY_EXECUTABLE)
     message(FATAL_ERROR "objcopy not found.")

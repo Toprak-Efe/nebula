@@ -17,6 +17,7 @@ void camera_view_transform(camera_t *camera, mat4 out);
 void camera_move(camera_t *camera, vec3 delta);
 void camera_forward(camera_t *camera, vec3 in, float *x, float *y);
 void camera_inverse(camera_t *camera, vec3 out, float x, float y);
+void camera_project(camera_t *camera);
 void initialize_camera(camera_t *camera);
 void uninitialize_camera(camera_t *camera);
 
