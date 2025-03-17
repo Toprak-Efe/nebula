@@ -1,18 +1,5 @@
 #include "camera.h"
 
-vec3 anchor_point = {
-    0.0f,
-    0.0f,
-    0.0f
-};
-
-mat4 axis_remapping_matrix = {
-    {0.0f, 0.0f,-1.0f, 0.0f},
-    {-1.0f,0.0f, 0.0f, 0.0f},
-    {0.0f, 1.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 1.0f}
-};
-
 void camera_model_transform(camera_t *camera, mat4 out) {
     mat4 m_rotation, m_transform;
     vec3 v_rotation = {0.0f, -glm_rad(camera->direction.dec), glm_rad(camera->direction.ra)};
@@ -43,6 +30,7 @@ void camera_raycast(camera_t *camera, equatorial_pose_t *pose, float x, float y)
     int w, h;
     float x_norm = ((float) x / (float) w)*2.0 - 1.0;
     float y_norm = ((float) y / (float) h)*2.0 - 1.0;
+
     SDL_GetWindowSize(g_window->window, &w, &h);
     vec4 mouse_ray = {x_norm, y_norm, -1.0, 1.0};
     mat4 perspective_inv;
@@ -57,6 +45,34 @@ void camera_raycast(camera_t *camera, equatorial_pose_t *pose, float x, float y)
     camera_mouse_direction.z = cursor_coords[2];
     equatorial_pose_t cursor_direction;
     cartesian_to_equatorial(&camera_mouse_direction, pose);
+}
+
+void camera_forward(camera_t *camera, vec4 in, float *x, float *y) {
+    mat4 view_transform;
+
+    camera_view_transform(camera, view_transform);
+
+    vec4 out;
+    glm_mat4_mulv(view_transform, in, out);
+    glm_mat4_mulv(camera->projection, out, out);
+
+    *x = out[0];
+    *y = out[1];
+}
+
+void camera_inverse(camera_t *camera, vec4 out, float x, float y) {
+    mat4 v_inverse_transform;
+    mat4 p_inverse_transform;
+    mat4 view_transform;
+
+    camera_view_transform(camera, view_transform);
+    glm_mat4_inv(view_transform, v_inverse_transform);
+    glm_mat4_inv(camera->projection, p_inverse_transform);
+
+    vec4 p = {x, y, -0.5, 1.0};
+
+    glm_mat4_mulv(p_inverse_transform, p, p);
+    glm_mat4_mulv(v_inverse_transform, p, out);
 }
 
 void initialize_camera(camera_t *camera) {

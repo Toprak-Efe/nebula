@@ -37,8 +37,10 @@ int main(int argc, char **argv) {
                 break;
             case SDL_MOUSEMOTION:
                 process_input(g_main_scene, &event);
+                break;
             case SDL_KEYDOWN:
                 process_input(g_main_scene, &event);
+                break;
             default:
                 break;
             }

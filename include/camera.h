@@ -12,12 +12,11 @@ typedef struct {
     cartesian_pose_t position;
 } camera_t;
 
-extern mat4 axis_remapping_matrix;
-
 void camera_model_transform(camera_t *camera, mat4 out);
 void camera_view_transform(camera_t *camera, mat4 out);
 void camera_move(camera_t *camera, vec3 delta);
-void camera_raycast(camera_t *camera, equatorial_pose_t *pose, float x, float y);
+void camera_forward(camera_t *camera, vec3 in, float *x, float *y);
+void camera_inverse(camera_t *camera, vec3 out, float x, float y);
 void initialize_camera(camera_t *camera);
 void uninitialize_camera(camera_t *camera);
 
