@@ -22,7 +22,7 @@ void logprint(log_level level, const char *fmt, ...) {
     va_start(args, fmt);
     time(&g_current_time);
     g_time_info = localtime(&g_current_time);
-    fprintf(g_log_file, "[%d-%d-%d %d:%d:%d] ", 
+    fprintf(g_log_file, "[%d-%d-%d %d:%d:%02d] ", 
         g_time_info->tm_year + 1900,
         g_time_info->tm_mon + 1,
         g_time_info->tm_mday,
@@ -50,7 +50,7 @@ void logprint(log_level level, const char *fmt, ...) {
 
     #ifdef DEBUG
     va_start(args, fmt);
-    fprintf(stdout, "[%d-%d-%d %d:%d:%d] ", 
+    fprintf(stdout, "[%d-%d-%d %d:%d:%02d] ", 
         g_time_info->tm_year + 1900,
         g_time_info->tm_mon + 1,
         g_time_info->tm_mday,
@@ -60,16 +60,24 @@ void logprint(log_level level, const char *fmt, ...) {
     );
     switch (level) {
         case LOG_INFO:
+            fprintf(stdout, SET_COLOR_GREEN);
             fprintf(stdout, "INFO: ");
+            fprintf(stdout, RESET_COLOR);
             break;
         case LOG_WARN:
+            fprintf(stdout, SET_COLOR_YELLOW);
             fprintf(stdout, "WARN: ");
+            fprintf(stdout, RESET_COLOR);
             break;
         case LOG_DEBUG:
+            fprintf(stdout, SET_COLOR_GREEN);
             fprintf(stdout, "DEBUG: ");
+            fprintf(stdout, RESET_COLOR);
             break;
         case LOG_ERROR:
+            fprintf(stdout, SET_COLOR_RED);
             fprintf(stdout, "ERROR: ");
+            fprintf(stdout, RESET_COLOR);
             break;
     }
     vfprintf(stdout, fmt, args);
