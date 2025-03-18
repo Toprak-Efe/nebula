@@ -24,9 +24,10 @@ void process_input(scene_t *scene, SDL_Event *event) {
     case SDL_MOUSEMOTION:
         if (SDL_GetMouseState(&x, &y) & SDL_BUTTON_LMASK) {
             SDL_GetWindowSize(g_window->window, &w, &h);
-            float x_norm = ((float) x / (float) w)*2.0 - 1.0;
-            float y_norm = ((float) y / (float) h)*2.0 - 1.0;
-            camera_inverse(&g_main_scene->camera, pivot_pose, x_norm, y_norm);            
+            float x_norm = (((float) x / (float) w)*2.0 - 1.0)*0.0;
+            float y_norm = (((float) y / (float) h)*2.0 - 1.0)*0.0;
+            camera_inverse(&g_main_scene->camera, pivot_pose, x_norm, y_norm);
+
             cartesian_pose_t c_mouse, c_pivot;
             equatorial_pose_t e_mouse, e_pivot;
             c_mouse.x = pivot_pose[0];
@@ -39,7 +40,6 @@ void process_input(scene_t *scene, SDL_Event *event) {
             cartesian_to_equatorial(&c_pivot, &e_pivot);
             //scene->camera.direction.dec -= e_pivot.dec - e_mouse.dec;
             scene->camera.direction.ra -= e_pivot.ra - e_mouse.ra;
-            logprint(LOG_DEBUG, "Camera movement.");
         }
         break;
     case SDL_MOUSEBUTTONDOWN:

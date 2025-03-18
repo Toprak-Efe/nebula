@@ -69,7 +69,7 @@ void camera_inverse(camera_t *camera, vec4 out, float x, float y) {
     glm_mat4_inv(view_transform, v_inverse_transform);
     glm_mat4_inv(camera->projection, p_inverse_transform);
 
-    vec4 p = {x, y, 0.5, 1.0};
+    vec4 p = {x, y, -0.5, 1.0};
 
     glm_mat4_mulv(p_inverse_transform, p, p);
     glm_mat4_mulv(v_inverse_transform, p, out);
