@@ -2,10 +2,8 @@
 
 void camera_model_transform(camera_t *camera, mat4 out) {
     mat4 m_rotation, m_transform;
-    vec3 v_rotation = {glm_rad(camera->direction.dec), -glm_rad(camera->direction.ra), 0.0f};
-    vec4 v_transform = {camera->position.x, camera->position.y, camera->position.z, 0.0f};
-    glm_euler_xyz(v_rotation, m_rotation);
-    glm_translate_make(m_transform, v_transform);
+    glm_quat_mat4(camera->orientation, m_rotation);
+    glm_translate_make(m_transform, camera->position);
     glm_mat4_mul(m_transform, m_rotation, out);
 }
 
@@ -21,9 +19,7 @@ void camera_move(camera_t *camera, vec3 delta) {
     vec4 delta_p = {delta[0], delta[1], delta[2], 0.0f};
     vec4 output = {0.0f, 0.0f, 0.0f, 1.0f};
     glm_mat4_mulv(transform, delta_p, output);
-    camera->position.x += output[0];
-    camera->position.y += output[1];
-    camera->position.z += output[2];
+    glm_vec3_add(camera->position, output, camera->position);
 }
 
 void camera_raycast(camera_t *camera, equatorial_pose_t *pose, float x, float y) {
@@ -69,11 +65,10 @@ void camera_inverse(camera_t *camera, vec4 out, float x, float y) {
     glm_mat4_inv(view_transform, v_inverse_transform);
     glm_mat4_inv(camera->projection, p_inverse_transform);
 
-    vec4 p = {x, y, -0.5, 1.0};
+    vec4 p = {x, -y, 0.5, 1.0};
 
     glm_mat4_mulv(p_inverse_transform, p, p);
     glm_mat4_mulv(v_inverse_transform, p, out);
-    out[1] = -out[1];
 }
 
 void camera_project(camera_t *camera) {
@@ -81,14 +76,10 @@ void camera_project(camera_t *camera) {
 }
 
 void initialize_camera(camera_t *camera) {
-    camera->arclength = 90.0f;
+    camera->arclength = 30.0f;
     glm_perspective(glm_rad(camera->arclength), 16.0f/9.0f, 0.01f, 100000.0f, camera->projection);
-    camera->direction.r = 1.0f;
-    camera->direction.ra = 0.0f;
-    camera->direction.dec = 0.0f;
-    camera->position.x = 0.0f;
-    camera->position.y = 0.0f;
-    camera->position.z = 0.0f;
+    glm_vec3_zero(camera->position);
+    glm_quat_identity(camera->orientation);
 }
 
 void uninitialize_camera(camera_t *camera) {

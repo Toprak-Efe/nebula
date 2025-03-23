@@ -35,19 +35,8 @@ int main(int argc, char **argv) {
             case SDL_QUIT:
                 running = 0;
                 break;
-            case SDL_MOUSEMOTION:
-                process_input(g_main_scene, &event);
-                break;
-            case SDL_KEYDOWN:
-                process_input(g_main_scene, &event);
-                break;
-            case SDL_MOUSEWHEEL:
-                process_input(g_main_scene, &event);
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                process_input(g_main_scene, &event);
-                break;
             default:
+                process_input(g_main_scene, &event);
                 break;
             }
         }

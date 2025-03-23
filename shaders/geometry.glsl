@@ -1,22 +1,31 @@
 #version 460 core
-
 layout (points) in;
-layout (points, max_vertices = 32) out;
-
-in vec3 vertices[];
-out vec3 gs_vertices; 
+layout (line_strip, max_vertices = 200) out;
 
 void main() {
-    gs_vertices = vertices[0];
-    
-    for (int i = -5; i <= 5; i++) {
-        gl_Position = gl_in[0].gl_Position + i*vec4(0.005, 0.0, 0.0, 0.0);
-        EmitVertex();
-    }
-    for (int i = -5; i <= 5; i++) {
-        gl_Position = gl_in[0].gl_Position + i*vec4(0.0, 0.005, 0.0, 0.0);
-        EmitVertex();
-    }
+    int numSegments = 32;
+    float radius = 0.1;
 
+    for (int i = 0; i <= numSegments; ++i) {
+        float angle = 2.0 * 3.14159265358979323846 * float(i) / float(numSegments);
+        vec3 offset = vec3(radius * cos(angle), radius * sin(angle), 0.0);
+        gl_Position = gl_in[0].gl_Position + vec4(offset, 0.0);
+        EmitVertex();
+    }
+    EndPrimitive();
+    for (int i = 0; i <= numSegments; ++i) {
+        float angle = 2.0 * 3.14159265358979323846 * float(i) / float(numSegments);
+        vec3 offset = vec3(0.0, radius * cos(angle), radius * sin(angle));
+        gl_Position = gl_in[0].gl_Position + vec4(offset, 0.0);
+        EmitVertex();
+    }
+    EndPrimitive();
+
+    for (int i = 0; i <= numSegments; ++i) {
+        float angle = 2.0 * 3.14159265358979323846 * float(i) / float(numSegments);
+        vec3 offset = vec3(radius * cos(angle),0.0, radius * sin(angle));
+        gl_Position = gl_in[0].gl_Position + vec4(offset, 0.0);
+        EmitVertex();
+    }
     EndPrimitive();
 }

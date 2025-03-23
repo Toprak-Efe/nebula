@@ -13,23 +13,22 @@ void uninitialize_scene(scene_t *scene) {
 }
 
 void process_input(scene_t *scene, SDL_Event *event) {
-    uint8_t pivot = false;
+    static bool pivot = false;
     vec4 pivot_pose;
     int x, y;
     int w, h;
     vec3 vector = {0.0f, 0.0f, 0.0f};
-    vec3 v_rotation;
-    mat4 rotation;
     switch (event->type) {
     case SDL_MOUSEMOTION:
-        if (SDL_GetMouseState(&x, &y) & SDL_BUTTON_LMASK) {
+        if ((SDL_GetMouseState(&x, &y) & SDL_BUTTON_LMASK) && pivot) {
             SDL_GetWindowSize(g_window->window, &w, &h);
-            float x_norm = (((float) x / (float) w)*2.0 - 1.0)*0.0;
-            float y_norm = (((float) y / (float) h)*2.0 - 1.0)*0.0;
+            float x_norm = (((float) x / (float) w)*2.0 - 1.0);
+            float y_norm = (((float) y / (float) h)*2.0 - 1.0);
             camera_inverse(&g_main_scene->camera, pivot_pose, x_norm, y_norm);
 
             cartesian_pose_t c_mouse, c_pivot;
             equatorial_pose_t e_mouse, e_pivot;
+
             c_mouse.x = pivot_pose[0];
             c_mouse.y = pivot_pose[1];
             c_mouse.z = pivot_pose[2];
@@ -38,8 +37,14 @@ void process_input(scene_t *scene, SDL_Event *event) {
             c_pivot.z = scene->pivot_pose[2];
             cartesian_to_equatorial(&c_mouse, &e_mouse);
             cartesian_to_equatorial(&c_pivot, &e_pivot);
-            //scene->camera.direction.dec -= e_pivot.dec - e_mouse.dec;
-            scene->camera.direction.ra -= e_pivot.ra - e_mouse.ra;
+            
+            versor rotation;
+            glm_vec3_zero(rotation);
+            vector[2] += e_pivot.dec - e_mouse.dec;
+            vector[1] += e_pivot.ra - e_mouse.ra;
+
+            glm_euler_yxz_quat(vector, rotation);
+            glm_quat_mul(rotation, scene->camera.orientation, scene->camera.orientation);
         }
         break;
     case SDL_MOUSEBUTTONDOWN:
@@ -49,14 +54,13 @@ void process_input(scene_t *scene, SDL_Event *event) {
             float x_norm = ((float) x / (float) w)*2.0 - 1.0;
             float y_norm = ((float) y / (float) h)*2.0 - 1.0;
             camera_inverse(&g_main_scene->camera, pivot_pose, x_norm, y_norm);
-            scene->pivot_pose[0] = pivot_pose[0];
-            scene->pivot_pose[1] = pivot_pose[1];
-            scene->pivot_pose[2] = pivot_pose[2];
+            glm_vec4_copy3(pivot_pose, scene->pivot_pose);
+            pivot = true;
         }
         break;
     case SDL_MOUSEBUTTONUP:
         if (event->button.button == SDL_BUTTON_LEFT) {
-            /* Motion animation */
+            pivot = false;
         }
         break;
     case SDL_MOUSEWHEEL:
@@ -64,8 +68,8 @@ void process_input(scene_t *scene, SDL_Event *event) {
         if (scene->camera.arclength < 5.0f) {
             scene->camera.arclength = 5.0f;
         }
-        if (scene->camera.arclength > 180.0f) {
-            scene->camera.arclength = 180.0f;
+        if (scene->camera.arclength > 60.0f) {
+            scene->camera.arclength = 60.0f;
         }
         camera_project(&scene->camera);
         break;
@@ -74,24 +78,23 @@ void process_input(scene_t *scene, SDL_Event *event) {
 #ifdef CAMERA_MOVEMENT_CONTROLS
         case SDLK_w:
             vector[2] = -0.01f;
-            camera_move(&g_main_scene->camera, vector);
+            camera_move(&scene->camera, vector);
             break;
         case SDLK_s:
             vector[2] = 0.01f;
-            camera_move(&g_main_scene->camera, vector);
+            camera_move(&scene->camera, vector);
             break;
         case SDLK_a:
             vector[0] = -0.01f;
-            camera_move(&g_main_scene->camera, vector);
+            camera_move(&scene->camera, vector);
             break;  
         case SDLK_d:
             vector[0] = 0.01f;
-            camera_move(&g_main_scene->camera, vector);
+            camera_move(&scene->camera, vector);
             break;
         case SDLK_ESCAPE:
-            g_main_scene->camera.position.x = 0.0f;
-            g_main_scene->camera.position.y = 0.0f;
-            g_main_scene->camera.position.z = 0.0f;
+            glm_vec3_zero(scene->camera.position);
+            glm_quat_identity(scene->camera.orientation);
             break;
 #endif
 #ifndef CAMERA_MOVEMENT_CONTROLS
@@ -175,7 +178,7 @@ void initialize_main_scene() {
     for (size_t i = 0; i < STARCOUNT; i++) {
         stars[i].r = 1.0f;
         stars[i].ra = (-90.0f + 180.0f*i/STARCOUNT);
-        stars[i].dec =  ((-90.0f + 180.0f*i/STARCOUNT)*45.05);
+        stars[i].dec =  ((-90.0f + 180.0f*i/STARCOUNT));
     }
     cartesian_pose_t *cartesian = malloc(sizeof(cartesian_pose_t) * STARCOUNT);
     if (!cartesian) {

@@ -8,8 +8,8 @@
 typedef struct {
     mat4 projection;
     float arclength;
-    equatorial_pose_t direction;
-    cartesian_pose_t position;
+    vec4 orientation;
+    vec4 position;
 } camera_t;
 
 void camera_model_transform(camera_t *camera, mat4 out);

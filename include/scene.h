@@ -7,7 +7,7 @@
 #include "shader.h"
 #include "coordinates.h"
 
-#define STARCOUNT 4096
+#define STARCOUNT 32
 
 typedef struct {
     camera_t camera;
