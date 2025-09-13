@@ -25,11 +25,9 @@ jobs:
     - name: Configure CMake
       env:
         CC: clang
-        CCXX: clang
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_CXX_COMPILER=$CC
 
     - name: Build
       env:
         CC: clang
-        CCXX: clang
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -DCMAKE_CXX_COMPILER=$CC
