@@ -3,13 +3,10 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
-#include <string>
-#include <memory>
 #include <log.hpp>
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
-
 
 extern "C" {
     #include <functions.h> 

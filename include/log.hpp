@@ -19,7 +19,9 @@ namespace astronomy {
 
     class Logger {
         public:
-            Logger() : m_log_file("log.txt", std::ios_base::app) {
+            Logger() :
+                m_log_file("log.txt", std::ios_base::app)
+            {
                 if (!m_log_file.is_open()) {
                     std::cerr << "Unable to open log file, exiting." << std::endl;
                     exit(1);

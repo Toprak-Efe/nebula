@@ -21,8 +21,9 @@ endif()
 
 set(SOURCES
     source/main.cpp
-    source/event.cpp
     source/functions.c
+    source/ecs.cpp
+    source/event.cpp
     source/window.cpp
     source/shaders.cpp
 )
