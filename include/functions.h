@@ -39,26 +39,13 @@
   OPENGL_FUNCTION(glIsProgram, PFNGLISPROGRAMPROC)                                \
   OPENGL_FUNCTION(glIsShader, PFNGLISSHADERPROC)                                  
 
-// Declare an OpenGL function. Other translation units that require
-// calling OpenGL functions will link against these declarations.
-//
-// OPENGL_DECLARE(glCreateShader, PFNGLCREATESHADERPROC)
-//
-//   becomes
-//
-// extern PFNGLCREATESHADERPROC glCreateShader;
 #define OPENGL_DECLARE(func_name, func_type)  \
     extern func_type func_name;
 
-// Set the OPENGL_FUNCTION macro to OPENGL_DECLARE and then splat
-// all of the declarations out here. Unset OPENGL_FUNCTION back
-// to nothing afterwards just to be safe.
 #define OPENGL_FUNCTION OPENGL_DECLARE
 OPENGL_FUNCTIONS
 #undef OPENGL_FUNCTION
 
-// Call this function after obtaining an OpenGL context
-// to dynamically load the modern functions.
 bool opengl_load_functions(void);
 
-#endif // FUNCTIONS_H
+#endif//FUNCTIONS_H

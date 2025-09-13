@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "log.h"
 
 scene_t *g_main_scene = NULL;
 
@@ -151,6 +152,8 @@ void adjust_scene(scene_t *scene) {
 }
 
 void initialize_main_scene() {
+    logprint(LOG_INFO, "Initializing main scene.");
+
     g_main_scene = calloc(1, sizeof(scene_t));
     if (!g_main_scene) {
         logprint(LOG_ERROR, "Failed to allocate memory for the main scene");
