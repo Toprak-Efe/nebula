@@ -19,7 +19,7 @@ void astronomy::windows::SDLWindow::initialize() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    float main_scale = ImGui_ImplSDL2_GetContentScaleForDisplay(0);
+    //float main_scale = ImGui_ImplSDL2_GetContentScaleForDisplay(0);
     
     window = SDL_CreateWindow(
         "Astronomy",
@@ -54,7 +54,6 @@ void astronomy::windows::SDLWindow::initialize() {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      
     
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
 
     // Setup scaling
@@ -90,5 +89,8 @@ astronomy::windows::SDLWindow::~SDLWindow() {
         SDL_DestroyWindow(window);
     }
     SDL_Quit();
+}
+
+void astronomy::windows::SDLWindow::draw() {
 }
 

@@ -18,6 +18,7 @@ struct SDLWindow {
     SDL_Window *window = NULL;
     SDL_GLContext context = NULL;
     void initialize();
+    void draw();
     ~SDLWindow();
 };
 

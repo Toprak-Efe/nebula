@@ -22,10 +22,18 @@ endif()
 set(SOURCES
     source/main.cpp
     source/functions.c
-    source/ecs.cpp
     source/event.cpp
     source/window.cpp
     source/shaders.cpp
+    source/meshes.cpp
+    source/textures.cpp
+    source/rendering.cpp
+    
+    source/ecs/ecsmanager.cpp
+    source/ecs/components/transform.cpp
+    source/ecs/components/program.cpp
+    source/ecs/components/camera.cpp
+    source/ecs/components/mesh.cpp
 )
 
 FetchContent_Declare(
@@ -35,21 +43,26 @@ FetchContent_Declare(
 )
 FetchContent_Declare(
     SDL2
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG release-2.32.4
-    GIT_PROGRESS TRUE
+    GIT_REPOSITORY  https://github.com/libsdl-org/SDL.git
+    GIT_TAG         release-2.32.4
+    GIT_PROGRESS    TRUE
+)
+FetchContent_Declare(
+    SDL2_image
+    GIT_REPOSITORY  https://github.com/libsdl-org/SDL_image.git
+    GIT_TAG         release-2.8.8
 )
 FetchContent_Declare(
   flecs
-  GIT_REPOSITORY https://github.com/SanderMertens/flecs.git
-  GIT_TAG v4.1.1
+  GIT_REPOSITORY    https://github.com/SanderMertens/flecs.git
+  GIT_TAG           v4.1.1
 )
 FetchContent_Declare(
     imgui
-  GIT_REPOSITORY https://github.com/ocornut/imgui.git
-  GIT_TAG v1.92.2b 
+    GIT_REPOSITORY  https://github.com/ocornut/imgui.git
+    GIT_TAG         v1.92.2b 
 )
-FetchContent_MakeAvailable(glm SDL2 flecs imgui)
+FetchContent_MakeAvailable(glm SDL2 SDL2_image flecs imgui)
 
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -85,6 +98,7 @@ add_dependencies(${PROJECT_NAME}
     imgui
     OpenGL::OpenGL
     SDL2::SDL2
+    SDL2_image::SDL2_image
     glm::glm
     flecs::flecs_static
 )
@@ -93,6 +107,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     imgui
     OpenGL::OpenGL
     SDL2::SDL2
+    SDL2_image::SDL2_image
     glm::glm
     flecs::flecs_static
 )

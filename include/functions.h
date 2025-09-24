@@ -1,6 +1,7 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+#include <GL/gl.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
@@ -37,7 +38,8 @@
   OPENGL_FUNCTION(glEnableVertexAttribArray, PFNGLENABLEVERTEXATTRIBARRAYPROC)    \
   OPENGL_FUNCTION(glDisableVertexAttribArray, PFNGLDISABLEVERTEXATTRIBARRAYPROC)  \
   OPENGL_FUNCTION(glIsProgram, PFNGLISPROGRAMPROC)                                \
-  OPENGL_FUNCTION(glIsShader, PFNGLISSHADERPROC)                                  
+  OPENGL_FUNCTION(glIsShader, PFNGLISSHADERPROC)                                  \
+  OPENGL_FUNCTION(glGenerateMipmap, PFNGLGENERATEMIPMAPPROC)                                  
 
 #define OPENGL_DECLARE(func_name, func_type)  \
     extern func_type func_name;

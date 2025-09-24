@@ -1,5 +1,10 @@
-#include "SDL_events.h"
-#include "event.hpp"
+#include "ecs/components/transform.hpp"
+#include "ecs/ecsmanager.hpp"
+#include "glm/fwd.hpp"
+#include <atomic>
+#include <ratio>
+
+#include <SDL_events.h>
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL.h>
 #include <GL/gl.h>
@@ -7,13 +12,15 @@
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_opengl3.h>
-
 #include <flecs.h>
-#include <atomic>
+
+#include <ecs/ecs.hpp>
 #include <log.hpp>
-#include <ratio>
+#include <event.hpp>
+#include <textures.hpp>
 #include <window.hpp>
 #include <shaders.hpp>
+#include <rendering.hpp>
 
 namespace astronomy {
 
@@ -25,12 +32,29 @@ using clock = std::chrono::high_resolution_clock;
 } // namespace astronomy
   
 using namespace astronomy;
-using namespace astronomy::events;
 using namespace std::literals::chrono_literals;
 
 int main() {
-    windows::mainWindow.initialize();
-    shaders::shaderManager.initialize();
+    rendering::manager.initialize();
+    resources::meshManager.initialize();
+    resources::shaderManager.initialize();
+    resources::textureManager.initialize();
+
+    {
+        const flecs::world &world = data::ecsManager.getRegistry(); 
+        flecs::entity default_cube = world.entity("default_cube");
+        default_cube.add<data::Transform>();
+        default_cube.add<data::Program>();
+        default_cube.set<data::Program>({"starShader"});
+        default_cube.add<data::Mesh>();
+        default_cube.set<data::Mesh>({"cube"});
+        flecs::entity default_camera = world.entity("default_camera");
+        default_camera.add<data::Camera>();
+        default_camera.set<data::Camera>({1920, 1080, 60.0});
+        default_camera.add<data::Active>();
+        default_camera.add<data::Transform>();
+        default_camera.get_mut<data::Transform>().position.x = -1.0;
+    }
 
     constexpr size_t TICKS_PER_SEC = 20;
     constexpr auto TIME_PER_TICK = 1000ms / TICKS_PER_SEC;
@@ -39,10 +63,9 @@ int main() {
     millisecond t_accumulated{0}; 
     
     std::atomic_bool running = true;
-    events::eventManager.registerEventCallback(SDL_QUIT, [&](SDL_Event *e) {
-        running = false;
-        return false;
-    });
+    events::eventManager.registerEventCallback(SDL_QUIT,
+        [&](SDL_Event *e) { return (bool) (running = false); }
+    );
     while (running) {
         millisecond delta = std::chrono::duration_cast<millisecond> (clock::now() - t_last);
         t_last += delta;
@@ -56,26 +79,10 @@ int main() {
 
         while (t_accumulated > TIME_PER_TICK) {
             t_accumulated -= TIME_PER_TICK;
-            // update systems
+            data::ecsManager.progressSystems(TIME_PER_TICK.count());
         }
         
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 
-                    1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::End();
-
-        glClearColor(0.2, 0.4, 0.3, 0.0);
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        SDL_GL_SwapWindow(windows::mainWindow.window);
-
+        rendering::manager.drawAll();
     }
 
     logger.log<INFO>("Exiting application.");
