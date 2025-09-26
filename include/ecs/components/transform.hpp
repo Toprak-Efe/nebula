@@ -7,20 +7,21 @@
 #include <glm/gtx/quaternion.hpp>
 #include <ecs/ecsmanager.hpp>
 
-namespace astronomy::data {
+namespace nebula::data {
 
 struct Transform {
     glm::quat orientation;
     glm::vec3 position;
     glm::vec3 scale;
-    
+
     Transform();
     glm::mat4 getModelTransform() const;
     glm::mat4 getInverseModelTransform() const;
+
 }; // struct Transform
 
 inline ECSComponentRegisterer<Transform> transformRegisterer;
 
-} // namespace astronomy::data
+} // namespace nebula::data
 
 #endif//TRANSFORM_HPP

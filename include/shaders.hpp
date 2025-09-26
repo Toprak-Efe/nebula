@@ -1,7 +1,9 @@
 #ifndef SHADERS_HPP
 #define SHADERS_HPP
 
+#include <glm/glm.hpp>
 #include <SDL_opengl.h>
+#include <variant>
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <string_view>
@@ -10,7 +12,7 @@
 #include <memory>
 #include <log.hpp>
 
-namespace astronomy::resources {
+namespace nebula::resources {
 
 struct shader_t {
     GLenum type;
@@ -58,6 +60,6 @@ private:
 
 inline ShaderManager shaderManager;
 
-}; // namespace astronomy::resources
+}; // namespace nebula::resources
    
 #endif // SHADERS_HPP

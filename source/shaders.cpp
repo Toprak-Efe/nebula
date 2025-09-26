@@ -5,7 +5,7 @@
 #include <cassert>
 #include <shaders.hpp>
 
-using namespace astronomy::resources;
+using namespace nebula::resources;
 
 Shader::Shader(Shader&& other) :
     id(other.id),
@@ -129,7 +129,6 @@ void ShaderManager::initialize() {
                 std::vector<std::string_view>({ 
                     "vertex",
                     "fragment",
-                    "geometry"
                 }),
                 std::vector<std::string_view>({
                     "transformation",

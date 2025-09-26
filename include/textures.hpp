@@ -12,7 +12,7 @@
 #include <string_view>
 #include <map>
 
-namespace astronomy::resources {
+namespace nebula::resources {
 
 class TextureManager {
 public:
@@ -27,6 +27,6 @@ private:
 
 inline TextureManager textureManager; 
 
-} // namespace astronomy::resources
+} // namespace nebula::resources
 
 #endif//TEXTURES_HPP

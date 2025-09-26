@@ -5,7 +5,7 @@
 #include <functional>
 #include <map>
 
-namespace astronomy::events {
+namespace nebula::events {
 
 struct Event {
     Event(SDL_Event &e);

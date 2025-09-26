@@ -2,7 +2,7 @@
 
 using str = const char *;
 
-void astronomy::windows::SDLWindow::initialize() {
+void nebula::windows::SDLWindow::initialize() {
     logger.log<INFO>("Initializing SDL.");
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -22,7 +22,7 @@ void astronomy::windows::SDLWindow::initialize() {
     //float main_scale = ImGui_ImplSDL2_GetContentScaleForDisplay(0);
     
     window = SDL_CreateWindow(
-        "Astronomy",
+        "Nebula",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         1080, 720, 
@@ -78,7 +78,7 @@ void astronomy::windows::SDLWindow::initialize() {
     
 }
 
-astronomy::windows::SDLWindow::~SDLWindow() {
+nebula::windows::SDLWindow::~SDLWindow() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -91,6 +91,6 @@ astronomy::windows::SDLWindow::~SDLWindow() {
     SDL_Quit();
 }
 
-void astronomy::windows::SDLWindow::draw() {
+void nebula::windows::SDLWindow::draw() {
 }
 

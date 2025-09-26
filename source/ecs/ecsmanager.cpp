@@ -1,6 +1,6 @@
 #include <ecs/ecsmanager.hpp>
 
-using namespace astronomy::data;
+using namespace nebula::data;
     
 
 void ECSManager::initialize() {

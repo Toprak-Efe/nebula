@@ -4,7 +4,7 @@
 #include <string_view>
 #include <ecs/ecsmanager.hpp>
 
-namespace astronomy::data {
+namespace nebula::data {
 
 struct Program {
     std::string_view name;
@@ -15,6 +15,6 @@ struct Program {
 
 inline ECSComponentRegisterer<Program> programRegisterer;
 
-} // namespace astronomy::data
+} // namespace nebula::data
 
 #endif//PROGRAM_HPP

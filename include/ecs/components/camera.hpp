@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <ecs/ecsmanager.hpp>
 
-namespace astronomy::data {
+namespace nebula::data {
 
 struct Camera {
     uint16_t width;
@@ -21,6 +21,6 @@ struct Active {};
 
 inline ECSComponentRegisterer<Camera> cameraRegisterer;
 
-} // namespace astronomy::data
+} // namespace nebula::data
 
 #endif//CAMERA_HPP

@@ -1,11 +1,11 @@
 #include <ecs/components/program.hpp>
 
-astronomy::data::Program::Program()
+nebula::data::Program::Program()
 {
     return;
 }
 
-astronomy::data::Program::Program(const std::string_view &name) : name(name)
+nebula::data::Program::Program(const std::string_view &name) : name(name)
 {
     return;
 }

@@ -4,7 +4,7 @@
 #include <flecs.h>
 #include <log.hpp>
 
-namespace astronomy::data {
+namespace nebula::data {
 
 class ECSManager {
 public:
@@ -35,6 +35,6 @@ struct ECSSystemRegisterer {
     }
 }; // namespace ECSSystemRegisterer
 
-} // namespace astronomy::ecs
+} // namespace nebula::ecs
 
 #endif//ECSMANAGER_HPP

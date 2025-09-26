@@ -5,7 +5,7 @@
 #include <ecs/ecsmanager.hpp>
 #include <glm/glm.hpp>
 
-namespace astronomy::data {
+namespace nebula::data {
 
 struct Mesh {
     std::string_view name;
@@ -16,7 +16,7 @@ struct Mesh {
 
 inline ECSComponentRegisterer<Mesh> meshRegisterer;
 
-} // namespace astronomy::data
+} // namespace nebula::data
 
 
 #endif//MESH_HPP

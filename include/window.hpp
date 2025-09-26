@@ -12,7 +12,7 @@ extern "C" {
     #include <functions.h> 
 };
 
-namespace astronomy::windows {
+namespace nebula::windows {
 
 struct SDLWindow {
     SDL_Window *window = NULL;

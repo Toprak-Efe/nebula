@@ -11,21 +11,19 @@
 #include <meshes.hpp>
 #include <window.hpp>
 
-namespace astronomy::rendering {
+namespace nebula::rendering {
 
 class RenderingManager {
 public:
     void initialize();
     void drawAll() const;
 private:
-    flecs::system m_object_render_system;
-    flecs::system m_surface_render_system;
-    void renderObjects(const glm::mat4 &mat_pv) const;
-    void renderSurfaces() const;
+    void renderObjects(const flecs::entity &camera) const;
+    void renderSurfaces(flecs::entity &camera) const;
 }; // class RenderingManager
 
 inline RenderingManager manager;
 
-}; // namespace astronomy::renderng
+}; // namespace nebula::renderng
 
 #endif//RENDERING_HPP

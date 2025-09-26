@@ -3,7 +3,7 @@
 
 #include <ecs/ecsmanager.hpp>
 
-namespace astronomy::data {
+namespace nebula::data {
 
 struct Surface {
     
@@ -11,6 +11,6 @@ struct Surface {
 
 inline ECSComponentRegisterer<Surface> surfaceRegisterer;
 
-} // namespace astronomy::data
+} // namespace nebula::data
 
 #endif//SURFACE_HPP

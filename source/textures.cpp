@@ -1,6 +1,6 @@
 #include <textures.hpp>
 
-using namespace astronomy::resources;
+using namespace nebula::resources;
 
 TextureManager::TextureManager() {
     return;

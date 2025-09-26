@@ -9,7 +9,7 @@
 #include <format>
 #include <ctime>
 
-namespace astronomy {
+namespace nebula {
 
     enum Levels {
         INFO,
@@ -45,7 +45,7 @@ namespace astronomy {
                         color_code = "\033[34m"; // Blue for DEBUG
                         msgstream << "[" << getTimestamp() << "]" << " " << color_code << "[DEBUG]:" << "\033[0m" << " " << msg << std::endl;
                     }
-                    else if constexpr (E == astronomy::ERROR) {
+                    else if constexpr (E == nebula::ERROR) {
                         color_code = "\033[31m"; // Red for ERROR
                         msgstream << "[" << getTimestamp() << "]" << " " << color_code << "[ERROR]:" << "\033[0m" << " " << msg << std::endl;
                     }
@@ -54,7 +54,7 @@ namespace astronomy {
                 }
         private:
             std::ofstream m_log_file; 
-            std::string getTimestamp() {
+            std::string getTimestamp() const {
                 std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
                 time_t tt = std::chrono::system_clock::to_time_t(now);
                 tm tm_now = *localtime(&tt);

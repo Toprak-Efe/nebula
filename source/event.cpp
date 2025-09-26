@@ -4,7 +4,7 @@
 #include <functional>
 #include <ranges>
 
-using namespace astronomy::events;
+using namespace nebula::events;
 
 Event::Event(SDL_Event &e) : 
     sdl(e),

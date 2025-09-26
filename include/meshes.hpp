@@ -9,7 +9,7 @@
 #include <functions.h>
 #include <glm/glm.hpp>
 
-namespace astronomy::resources {
+namespace nebula::resources {
 
 struct Mesh {
     GLuint vbo, vao; 
@@ -27,6 +27,6 @@ private:
 
 inline MeshManager meshManager;
 
-}; // namespace astronomy::resources
+}; // namespace nebula::resources
 
 #endif//MESHES_HPP
