@@ -87,11 +87,10 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${SDL2_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIRS}
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/game"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
 set(OpenGL_GL_PREFERENCE GLVND)
