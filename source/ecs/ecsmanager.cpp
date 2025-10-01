@@ -8,6 +8,11 @@ ECSManager::ECSManager() :
 
 }
 
+ECSManager& ECSManager::get() {
+    static ECSManager instance;
+    return instance;
+}
+
 ECSManager::~ECSManager() {
 
 }

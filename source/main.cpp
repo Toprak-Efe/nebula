@@ -40,7 +40,8 @@ using namespace std::literals::chrono_literals;
 using namespace nebula;
 
 int main() {
-    data::ecsManager.initialize(); 
+    nebula::data::ECSManager &ecsManager = data::ECSManager::get();
+    ecsManager.initialize(); 
     rendering::manager.initialize();
     resources::meshManager.initialize();
     resources::shaderManager.initialize();
@@ -73,7 +74,7 @@ int main() {
         while (t_accumulated > TIME_PER_TICK) {
             t_accumulated -= TIME_PER_TICK;
             float delta_time = TIME_PER_TICK.count()/1000.0f;
-            data::ecsManager.progressSystems(delta_time);
+            ecsManager.progressSystems(delta_time);
         }
 
         rendering::manager.drawAll();

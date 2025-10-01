@@ -8,22 +8,24 @@ namespace nebula::data {
 
 class ECSManager {
 public:
-    ECSManager();
     ~ECSManager();
+    ECSManager(const ECSManager&) = delete;
+    ECSManager& operator=(const ECSManager&) = delete;
+    static ECSManager& get();
     void initialize();
     void progressSystems(float d);
     void registerComponentType();
     flecs::world &getRegistry();
     ecs_world_t* getRegistryPtr();
 private:
+    ECSManager();
     flecs::world m_world;
 }; // class ECSManager
-
-inline ECSManager ecsManager; 
 
 template<typename T>
 struct ECSComponentRegisterer {
     ECSComponentRegisterer() {
+        ECSManager &ecsManager = ECSManager::get();
         flecs::world &ecs = ecsManager.getRegistry(); 
         logger.log<INFO>("Registering component {}.", typeid(T).name());
         ecs.component<T>();
