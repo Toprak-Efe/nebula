@@ -12,7 +12,7 @@ using namespace nebula::windows;
 using namespace nebula::rendering;
 
 void RenderingManager::initialize() {
-    flecs::world world = data::ecsManager.getRegistry();
+    flecs::world world = nebula::data::ECSManager::get().getRegistry();
     flecs::entity main_camera = world.entity("main_camera");
     main_camera.add<data::Camera>();
     main_camera.add<data::Active>();
@@ -21,7 +21,7 @@ void RenderingManager::initialize() {
 
 void RenderingManager::drawAll() const {
     /* Fetch Camera */
-    flecs::world world = data::ecsManager.getRegistry();
+    flecs::world world = nebula::data::ECSManager::get().getRegistry();
     const auto q = world.query<const data::Camera, const data::Active, const data::Transform>(); 
     flecs::entity active_camera = q.first();
     if (!active_camera.is_valid()) {
@@ -39,7 +39,7 @@ void RenderingManager::drawAll() const {
 
 void RenderingManager::renderObjects(const flecs::entity &camera) const {
     glm::mat4 mat_pv = camera.get<data::Camera>().getProjectionMatrix() * camera.get<data::Transform>().getInverseModelTransform();
-    flecs::world world = data::ecsManager.getRegistry();
+    flecs::world world = nebula::data::ECSManager::get().getRegistry();
     const auto q = world.query<const data::Mesh, const data::Program, const data::Transform>();
     q.each([&](flecs::entity e, const data::Mesh &m, const data::Program &p, const data::Transform &t) {
         const resources::Mesh &msh = resources::meshManager.getMesh(m.name);
