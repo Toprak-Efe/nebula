@@ -85,7 +85,7 @@ target_link_libraries(imgui
     OpenGL::OpenGL
 )
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} STATIC 
     ${SOURCES}
 )
 

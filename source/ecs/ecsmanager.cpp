@@ -2,6 +2,15 @@
 
 using namespace nebula::data;
     
+ECSManager::ECSManager() :
+    m_world()
+{
+
+}
+
+ECSManager::~ECSManager() {
+
+}
 
 void ECSManager::initialize() {
     m_world.set<flecs::Rest>({});
@@ -24,6 +33,3 @@ ecs_world_t* ECSManager::getRegistryPtr() {
     return m_world.c_ptr();
 }
 
-ECSManager::~ECSManager() {
-
-}

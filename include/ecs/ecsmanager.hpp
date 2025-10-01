@@ -8,12 +8,13 @@ namespace nebula::data {
 
 class ECSManager {
 public:
+    ECSManager();
+    ~ECSManager();
     void initialize();
     void progressSystems(float d);
     void registerComponentType();
     flecs::world &getRegistry();
     ecs_world_t* getRegistryPtr();
-    ~ECSManager();
 private:
     flecs::world m_world;
 }; // class ECSManager
