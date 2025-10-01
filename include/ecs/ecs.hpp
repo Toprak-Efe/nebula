@@ -8,5 +8,6 @@
 #include <ecs/components/program.hpp>
 #include <ecs/components/surface.hpp>
 #include <ecs/components/transform.hpp>
+#include <ecs/components/velocity.hpp>
 
 #endif//ECS_HPP
