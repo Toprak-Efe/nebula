@@ -54,9 +54,9 @@ FetchContent_Declare(
     GIT_TAG         release-2.8.8
 )
 FetchContent_Declare(
-  flecs
-  GIT_REPOSITORY    https://github.com/SanderMertens/flecs.git
-  GIT_TAG           v4.1.1
+    flecs
+    GIT_REPOSITORY    https://github.com/SanderMertens/flecs.git
+    GIT_TAG           v4.1.1
 )
 FetchContent_Declare(
     imgui
@@ -83,12 +83,14 @@ target_link_libraries(imgui
     OpenGL::OpenGL
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED
+    ${SOURCES}
+)
+
 target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${SDL2_INCLUDE_DIR}
-    ${OPENGL_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
 )
+
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
@@ -96,22 +98,15 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
-add_dependencies(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
+PUBLIC
+    flecs::flecs_static
     imgui
+PRIVATE
     OpenGL::OpenGL
     SDL2::SDL2
     SDL2_image::SDL2_image
     glm::glm
-    flecs::flecs_static
-)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    imgui
-    OpenGL::OpenGL
-    SDL2::SDL2
-    SDL2_image::SDL2_image
-    glm::glm
-    flecs::flecs_static
 )
 
 install(TARGETS ${PROJECT_NAME}
