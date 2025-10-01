@@ -11,10 +11,11 @@ public:
     void initialize();
     void progressSystems(float d);
     void registerComponentType();
-    const flecs::world &getRegistry();
+    flecs::world &getRegistry();
+    ecs_world_t* getRegistryPtr();
     ~ECSManager();
 private:
-    flecs::world m_ecs;
+    flecs::world m_world;
 }; // class ECSManager
 
 inline ECSManager ecsManager; 
@@ -22,7 +23,7 @@ inline ECSManager ecsManager;
 template<typename T>
 struct ECSComponentRegisterer {
     ECSComponentRegisterer() {
-        const flecs::world &ecs = ecsManager.getRegistry(); 
+        flecs::world &ecs = ecsManager.getRegistry(); 
         logger.log<INFO>("Registering component {}.", typeid(T).name());
         ecs.component<T>();
     }

@@ -48,9 +48,21 @@ void nebula::windows::SDLWindow::initialize() {
         SDL_GL_SetSwapInterval(1);
     }
     
+    static SDL_bool mouse_state = SDL_FALSE;
+    events::eventManager.registerEventCallback(SDL_KEYDOWN,
+        [&](SDL_Event *e) -> bool {
+            if (e->key.keysym.sym == SDLK_TAB) {
+                mouse_state = mouse_state == SDL_TRUE ? SDL_FALSE : SDL_TRUE; 
+                SDL_SetRelativeMouseMode(mouse_state);
+            }
+            return true;
+        }
+    );
+    
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;    
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      
     

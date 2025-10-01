@@ -34,6 +34,7 @@ set(SOURCES
     source/ecs/components/program.cpp
     source/ecs/components/camera.cpp
     source/ecs/components/mesh.cpp
+    source/ecs/components/velocity.cpp
 )
 
 FetchContent_Declare(
@@ -82,14 +83,16 @@ target_link_libraries(imgui
     OpenGL::OpenGL
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE 
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE 
     ${SDL2_INCLUDE_DIR}
     ${OPENGL_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
 )
-install(TARGETS ${CMAKE_PROJECT_NAME})
+target_include_directories(${PROJECT_NAME} PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/game"
+)
 
 set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)

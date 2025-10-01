@@ -5,36 +5,28 @@
 #include <functional>
 #include <map>
 
+typedef bool (*SDLEventCallbackPtr)(SDL_Event*);
+
 namespace nebula::events {
 
-struct Event {
-    Event(SDL_Event &e);
-    SDL_Event sdl;
-    bool consummated;
-};
-
 using Callback = std::function<bool(SDL_Event *)>;
-using CallbackList = std::vector<Callback>;
-using CallbackMap = std::map<SDL_EventType, CallbackList>; 
 
 class EventManager {
 public:
     EventManager();
     ~EventManager();
-    void processEvent(SDL_Event *event);
-    template <typename F>
-    void registerEventCallback(const SDL_EventType type, F callback) {
-        if (!m_callbacks.contains(type)) {
-            m_callbacks[type] = CallbackList();
-        }
-        m_callbacks[type].emplace_back(callback);
-    }
+    bool processEvent(SDL_Event *event);
+    void registerEventCallback(const SDL_EventType type, const Callback &callback);
+    void registerEventCallbackPtr(const SDL_EventType type, SDLEventCallbackPtr callback);
 private:
     std::map<SDL_EventType, std::vector<Callback>> m_callbacks;
+    std::map<SDL_EventType, std::vector<SDLEventCallbackPtr>> m_callback_pointers;
 };
 
 inline EventManager eventManager;
 
 }
+
+extern "C" void register_event_callback(uint16_t type, SDLEventCallbackPtr callback); 
 
 #endif//EVENT_HPP
