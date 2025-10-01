@@ -20,6 +20,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(SOURCES
+
     source/main.cpp
     source/functions.c
     source/event.cpp
@@ -27,6 +28,7 @@ set(SOURCES
     source/shaders.cpp
     source/meshes.cpp
     source/textures.cpp
+    source/log.cpp
     source/rendering.cpp
     
     source/ecs/ecsmanager.cpp
