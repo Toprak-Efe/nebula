@@ -102,7 +102,7 @@ find_package(OpenGL REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
 PUBLIC
-    flecs::flecs_static
+    flecs::flecs
     imgui
 PRIVATE
     OpenGL::OpenGL
