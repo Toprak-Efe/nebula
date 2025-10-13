@@ -1,59 +1,36 @@
-cmake_minimum_required(VERSION 3.31)
-project(nebula)
-
-include(GNUInstallDirs)
-include(FetchContent)
+cmake_minimum_required(VERSION 3.25)
+project(nebula
+    VERSION 0.0.1
+    DESCRIPTION "An ECS based game engine for C++ built with CMake"
+    LANGUAGES CXX C
+)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_ASAN "-fsanitize=address -g -O1 -fno-omit-frame-pointer")
-set(CMAKE_C_FLAGS_ASAN "-fsanitize=address -g -O1 -fno-omit-frame-pointer")
+include(FetchContent)
+include(GNUInstallDirs)
+include(GenerateExportHeader)
+include(CMakePackageConfigHelpers)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING 
-        "Choose the build type: Debug, Release, or ASan")
-endif()
-
-set(SOURCES
-
-    source/main.cpp
-    source/functions.c
-    source/event.cpp
-    source/window.cpp
-    source/shaders.cpp
-    source/meshes.cpp
-    source/textures.cpp
-    source/log.cpp
-    source/rendering.cpp
-    
-    source/ecs/ecsmanager.cpp
-    source/ecs/components/transform.cpp
-    source/ecs/components/program.cpp
-    source/ecs/components/camera.cpp
-    source/ecs/components/mesh.cpp
-    source/ecs/components/velocity.cpp
+string(TIMESTAMP TODAY "%d/%m/%Y")
+set(PROJECT_BUILD_DATE ${TODAY})
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.hpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/nebula/version.hpp"
+    @ONLY
 )
 
 FetchContent_Declare(
 	glm
 	GIT_REPOSITORY	https://github.com/g-truc/glm.git
-	GIT_TAG         1.0.1	
+	GIT_TAG         1.0.1
 )
 FetchContent_Declare(
     SDL2
     GIT_REPOSITORY  https://github.com/libsdl-org/SDL.git
     GIT_TAG         release-2.32.4
-    GIT_PROGRESS    TRUE
-)
-FetchContent_Declare(
-    SDL2_image
-    GIT_REPOSITORY  https://github.com/libsdl-org/SDL_image.git
-    GIT_TAG         release-2.8.8
 )
 FetchContent_Declare(
     flecs
@@ -63,9 +40,9 @@ FetchContent_Declare(
 FetchContent_Declare(
     imgui
     GIT_REPOSITORY  https://github.com/ocornut/imgui.git
-    GIT_TAG         v1.92.2b 
+    GIT_TAG         v1.92.2b
 )
-FetchContent_MakeAvailable(glm SDL2 SDL2_image flecs imgui)
+FetchContent_MakeAvailable(glm SDL2 flecs imgui)
 
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -80,38 +57,132 @@ target_include_directories(imgui PUBLIC
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
 )
-target_link_libraries(imgui
-    SDL2::SDL2
-    OpenGL::OpenGL
-)
-
-add_library(${PROJECT_NAME} STATIC 
-    ${SOURCES}
-)
-
-target_include_directories(${PROJECT_NAME} PRIVATE 
-    "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
-)
-
-target_include_directories(${PROJECT_NAME} PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
-)
-
-set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
+target_link_libraries(imgui PUBLIC SDL2::SDL2-static OpenGL::OpenGL)
 
-target_link_libraries(${PROJECT_NAME}
-PUBLIC
-    flecs::flecs
-    imgui
-PRIVATE
-    OpenGL::OpenGL
-    SDL2::SDL2
-    SDL2_image::SDL2_image
-    glm::glm
+add_library(nebula STATIC)
+add_library(nebula::nebula ALIAS nebula)
+
+set(SOURCES
+    source/main.cpp
+    source/utils/conversion.cpp
+    source/utils/functions.c
+    source/utils/log.cpp
+    source/utils/math.cpp
+    source/resources/meshes.cpp
+    source/resources/shaders.cpp
+    source/events/manager.cpp
+    source/events/conversion.cpp
+    source/render/manager.cpp
+    source/render/types.cpp
+    source/ecs/manager.cpp
+    source/ecs/components/camera.cpp
+    source/ecs/components/mesh.cpp
+    source/ecs/components/program.cpp
+    source/ecs/components/transform.cpp
+    source/ecs/components/velocity.cpp
 )
 
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+set(PUBLIC_HEADERS
+    include/nebula/nebula.hpp
+    include/nebula/events/manager.hpp
+    include/nebula/events/types.hpp
+    include/nebula/ecs/ecs.hpp # meta
+    include/nebula/ecs/manager.hpp
+    include/nebula/ecs/components/camera.hpp
+    include/nebula/ecs/components/mesh.hpp
+    include/nebula/ecs/components/program.hpp
+    include/nebula/ecs/components/surface.hpp
+    include/nebula/ecs/components/transform.hpp
+    include/nebula/ecs/components/velocity.hpp
+)
+
+set(PRIVATE_HEADERS
+    include/nebula/resources/meshes.hpp
+    include/nebula/resources/shaders.hpp
+    include/nebula/events/conversion.hpp
+    include/nebula/utils/conversion.hpp
+    include/nebula/utils/functions.h
+    include/nebula/utils/log.hpp
+    include/nebula/utils/math.hpp
+)
+
+target_sources(nebula
+    PRIVATE
+        ${SOURCES}
+    PRIVATE
+        FILE_SET private_headers 
+        TYPE HEADERS
+        BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        FILES
+            ${PRIVATE_HEADERS}
+    PUBLIC
+        FILE_SET public_headers 
+        TYPE HEADERS
+        BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        FILES
+            ${PUBLIC_HEADERS}
+)
+
+set_target_properties(nebula PROPERTIES
+    CXX_EXTENSIONS ON
+    POSITION_INDEPENDENT_CODE ON
+    CMAKE_CXX_VISIBILITY_PRESET hidden
+    CMAKE_VISIBILITY_INLINES_HIDDEN ON
+)
+
+generate_export_header(nebula
+    BASE_NAME NEBULA
+    EXPORT_FILE_NAME nebula/export.hpp
+)
+
+target_include_directories(nebula
+    PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+        "$<INSTALL_INTERFACE:include>"
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+target_link_libraries(nebula
+    PUBLIC
+        flecs::flecs
+    PRIVATE
+        $<BUILD_INTERFACE:imgui>
+        $<BUILD_INTERFACE:SDL2::SDL2-static>
+        $<BUILD_INTERFACE:OpenGL::OpenGL>
+        $<BUILD_INTERFACE:glm::glm-header-only>
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/nebula-config-version.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(
+    "cmake/nebula-config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/nebula-config.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/nebula"
+)
+
+install(TARGETS nebula
+    EXPORT nebula-targets
+    FILE_SET public_headers DESTINATION include
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(EXPORT nebula-targets
+    FILE nebula-targets.cmake
+    NAMESPACE nebula::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/nebula"
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/nebula-config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/nebula-config-version.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/nebula"
 )
 

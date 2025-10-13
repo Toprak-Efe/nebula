@@ -1,4 +1,4 @@
-#include <ecs/components/mesh.hpp>
+#include "../../../include/nebula/ecs/components/mesh.hpp"
 
 nebula::data::Mesh::Mesh() 
 {
