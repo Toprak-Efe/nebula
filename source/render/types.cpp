@@ -1,10 +1,10 @@
 #include <imgui.h>
-#include <imgui_impl_sdl2.h>
-#include <imgui_impl_opengl3.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <backends/imgui_impl_opengl3.h>
 
 #include "../../include/nebula/render/types.hpp"
 #include "../../include/nebula/utils/log.hpp"
-#include "../../include/nebula/utils/functions.h"
+#include "../../include/nebula/utils/functions.hpp"
 
 using str = const char *;
 

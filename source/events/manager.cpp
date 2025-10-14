@@ -3,6 +3,10 @@
 
 using namespace nebula::events;
 
+EventManager::EventManager() {
+
+}
+
 EventManager::~EventManager() {
 
 }

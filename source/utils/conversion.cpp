@@ -1,8 +1,6 @@
 #include "../../include/nebula/utils/conversion.hpp"
 
-using namespace nebula::data;
-
-glm::mat4 nebulaToGlm(Mat4 mat_in) {
+glm::mat4 nebula::data::nebulaToGlm(nebula::data::Mat4 mat_in) {
     glm::mat4 out;
     for (size_t i = 0; i < 4; i++) {
         for (size_t j = 0; j < 4; j++) {
@@ -12,8 +10,8 @@ glm::mat4 nebulaToGlm(Mat4 mat_in) {
     return out;
 }
 
-Mat4 glmToNebula(glm::mat4 mat_in) {
-    Mat4 out;
+nebula::data::Mat4 nebula::data::glmToNebula(glm::mat4 mat_in) {
+    nebula::data::Mat4 out;
     for (size_t i = 0; i < 4; i++) {
         for (size_t j = 0; j < 4; j++) {
             out[i][j] = mat_in[i][j];

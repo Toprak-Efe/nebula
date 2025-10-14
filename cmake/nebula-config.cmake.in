@@ -1,8 +1,9 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
-find_dependency(flecs REQUIRED)
+find_dependency(SDL2 REQUIRED)
+find_dependency(OpenGL REQUIRED)
+find_dependency(Threads REQUIRED)
 
-if(NOT TARGET nebula::nebula)
-    include("${CMAKE_CURRENT_LIST_DIR}/nebula-targets.cmake")
-endif()
+include("${CMAKE_CURRENT_LIST_DIR}/nebula-targets.cmake")
+

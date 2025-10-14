@@ -1,4 +1,4 @@
-#include "../../include/nebula/utils/functions.h"
+#include "../../include/nebula/utils/functions.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 

@@ -1,9 +1,13 @@
 #include <cassert>
 #include "../../include/nebula/utils/log.hpp"
 #include "../../include/nebula/resources/meshes.hpp"
-#include "../../include/nebula/utils/functions.h"
+#include "../../include/nebula/utils/functions.hpp"
 
 using namespace nebula::resources;
+
+MeshManager::MeshManager() {
+    return;
+}
 
 void MeshManager::initialize() {
     Logger &logger = Logger::get();

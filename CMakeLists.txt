@@ -22,6 +22,9 @@ configure_file(
     @ONLY
 )
 
+find_package(OpenGL REQUIRED)
+find_package(Threads REQUIRED)
+
 FetchContent_Declare(
 	glm
 	GIT_REPOSITORY	https://github.com/g-truc/glm.git
@@ -42,9 +45,17 @@ FetchContent_Declare(
     GIT_REPOSITORY  https://github.com/ocornut/imgui.git
     GIT_TAG         v1.92.2b
 )
+FetchContent_GetProperties(flecs SOURCE_DIR flecs_SOURCE_DIR)
 FetchContent_MakeAvailable(glm SDL2 flecs imgui)
 
-add_library(imgui STATIC
+add_library(flecs_object OBJECT
+    ${flecs_SOURCE_DIR}/distr/flecs.c
+)
+target_include_directories(flecs_object PRIVATE
+    ${flecs_SOURCE_DIR}/distr
+)
+
+add_library(imgui_object OBJECT 
     ${imgui_SOURCE_DIR}/imgui.cpp
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
     ${imgui_SOURCE_DIR}/imgui_demo.cpp
@@ -53,12 +64,11 @@ add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
-target_include_directories(imgui PUBLIC
+target_include_directories(imgui_object PRIVATE 
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
 )
-find_package(OpenGL REQUIRED)
-target_link_libraries(imgui PUBLIC SDL2::SDL2-static OpenGL::OpenGL)
+target_link_libraries(imgui_object PUBLIC SDL2::SDL2 OpenGL::OpenGL)
 
 add_library(nebula STATIC)
 add_library(nebula::nebula ALIAS nebula)
@@ -66,7 +76,7 @@ add_library(nebula::nebula ALIAS nebula)
 set(SOURCES
     source/main.cpp
     source/utils/conversion.cpp
-    source/utils/functions.c
+    source/utils/functions.cpp
     source/utils/log.cpp
     source/utils/math.cpp
     source/resources/meshes.cpp
@@ -95,6 +105,8 @@ set(PUBLIC_HEADERS
     include/nebula/ecs/components/surface.hpp
     include/nebula/ecs/components/transform.hpp
     include/nebula/ecs/components/velocity.hpp
+    include/nebula/utils/log.hpp
+    include/nebula/utils/math.hpp
 )
 
 set(PRIVATE_HEADERS
@@ -102,20 +114,28 @@ set(PRIVATE_HEADERS
     include/nebula/resources/shaders.hpp
     include/nebula/events/conversion.hpp
     include/nebula/utils/conversion.hpp
-    include/nebula/utils/functions.h
-    include/nebula/utils/log.hpp
-    include/nebula/utils/math.hpp
+    include/nebula/utils/functions.hpp
 )
 
 target_sources(nebula
     PRIVATE
         ${SOURCES}
+        $<TARGET_OBJECTS:flecs_object>
+        $<TARGET_OBJECTS:imgui_object>
     PRIVATE
         FILE_SET private_headers 
         TYPE HEADERS
         BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/include"
         FILES
             ${PRIVATE_HEADERS}
+    PRIVATE
+        FILE_SET imgui_private_headers
+        TYPE HEADERS
+        BASE_DIRS "${imgui_SOURCE_DIR}"
+        FILES
+            ${imgui_SOURCE_DIR}/imgui.h
+            ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.h
+            ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.h
     PUBLIC
         FILE_SET public_headers 
         TYPE HEADERS
@@ -138,6 +158,8 @@ generate_export_header(nebula
 
 target_include_directories(nebula
     PUBLIC
+        "$<BUILD_INTERFACE:${imgui_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${flecs_SOURCE_DIR}/distr>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/generated>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
         "$<INSTALL_INTERFACE:include>"
@@ -146,11 +168,9 @@ target_include_directories(nebula
 )
 
 target_link_libraries(nebula
-    PUBLIC
-        flecs::flecs
     PRIVATE
-        $<BUILD_INTERFACE:imgui>
-        $<BUILD_INTERFACE:SDL2::SDL2-static>
+        Threads::Threads
+        $<BUILD_INTERFACE:SDL2::SDL2>
         $<BUILD_INTERFACE:OpenGL::OpenGL>
         $<BUILD_INTERFACE:glm::glm-header-only>
 )
@@ -172,6 +192,10 @@ install(TARGETS nebula
     FILE_SET public_headers DESTINATION include
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(FILES "${flecs_SOURCE_DIR}/distr/flecs.h"
+    DESTINATION include/nebula/ecs
 )
 
 install(EXPORT nebula-targets

@@ -45,5 +45,5 @@
 OPENGL_FUNCTIONS
 #undef OPENGL_FUNCTION
 
- bool opengl_load_functions(void);
+bool opengl_load_functions(void);
 

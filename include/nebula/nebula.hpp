@@ -1,7 +1,7 @@
 #ifndef NEBULA_HPP
 #define NEBULA_HPP
 
-#include "ecs/manager.hpp"
+#include "ecs/ecs.hpp"
 #include "events/manager.hpp"
 
 namespace nebula {

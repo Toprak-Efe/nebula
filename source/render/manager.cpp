@@ -5,11 +5,11 @@
 
 #include <flecs.h>
 #include <imgui.h>
-#include <imgui_impl_sdl2.h>
-#include <imgui_impl_opengl3.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <backends/imgui_impl_opengl3.h>
 
 #include "../../include/nebula/ecs/ecs.hpp"
-#include "../../include/nebula/utils/functions.h"
+#include "../../include/nebula/utils/functions.hpp"
 #include "../../include/nebula/resources/shaders.hpp"
 #include "../../include/nebula/resources/meshes.hpp"
 #include "../../include/nebula/ecs/components/camera.hpp"
@@ -19,6 +19,15 @@
 
 using namespace nebula::windows;
 using namespace nebula::rendering;
+
+RenderingManager::RenderingManager() {
+    return;
+}
+
+RenderingManager::~RenderingManager() {
+    return;
+}
+
 
 void RenderingManager::initialize() {
     flecs::world world = nebula::data::ECSManager::get().getRegistry();

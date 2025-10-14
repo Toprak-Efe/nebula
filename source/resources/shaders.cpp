@@ -5,7 +5,7 @@
 #include <SDL2/SDL_opengl.h>
 
 #include "../../include/nebula/resources/shaders.hpp"
-#include "../../include/nebula/utils/functions.h"
+#include "../../include/nebula/utils/functions.hpp"
 #include "../../include/nebula/utils/log.hpp"
 
 using namespace nebula::resources;
@@ -90,6 +90,10 @@ void ShaderProgram::addUniform(const std::string_view &str, const GLint val) {
 GLint ShaderProgram::getUniform(const std::string_view &str) const {
     assert(udict.contains(str));
     return udict.at(str);
+}
+
+ShaderManager::ShaderManager() {
+    return;
 }
 
 void ShaderManager::initialize() {
