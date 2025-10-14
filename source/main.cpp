@@ -69,9 +69,11 @@ int main() {
     millisecond t_accumulated{0}; 
 
     std::atomic_bool running = true;
-    eventManager.registerEventCallback(events::EventType::WindowClose,
-        [&](events::Event *) -> bool { return !((bool) (running = false)); }
-    );
+    //eventManager.registerEventCallback(events::EventType::WindowClose,
+    //     [&](events::Event *) -> bool {
+    //        return false;
+    //    }
+    //);
     while (running) {
         millisecond delta = std::chrono::duration_cast<millisecond> (clock::now() - t_last);
         t_last += delta;
@@ -80,8 +82,9 @@ int main() {
         SDL_Event sdl_event;
         while (SDL_PollEvent(&sdl_event)) {
             ImGui_ImplSDL2_ProcessEvent(&sdl_event);
-            events::Event event = events::sdl_to_nebula(sdl_event); 
-            eventManager.processEvent(&event);
+            if (sdl_event.type == SDL_QUIT) running = false;
+            //events::Event event = events::sdl_to_nebula(sdl_event); 
+            //eventManager.processEvent(&event);
         }
 
         while (t_accumulated > TIME_PER_TICK) {

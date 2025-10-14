@@ -7,11 +7,11 @@ namespace nebula::rendering {
 
 class RenderingManager {
 public:
+    static RenderingManager &get();
     ~RenderingManager();
     RenderingManager(const RenderingManager &) = delete;
     RenderingManager(RenderingManager &&) = delete;
     RenderingManager& operator=(const RenderingManager&) = delete;
-    static RenderingManager &get();
     void initialize();
     void drawAll() const;
 private:

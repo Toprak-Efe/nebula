@@ -46,6 +46,7 @@ FetchContent_Declare(
     GIT_TAG         v1.92.2b
 )
 FetchContent_GetProperties(flecs SOURCE_DIR flecs_SOURCE_DIR)
+FetchContent_GetProperties(imgui SOURCE_DIR imgui_SOURCE_DIR)
 FetchContent_MakeAvailable(glm SDL2 flecs imgui)
 
 add_library(flecs_object OBJECT
@@ -86,6 +87,7 @@ set(SOURCES
     source/render/manager.cpp
     source/render/types.cpp
     source/ecs/manager.cpp
+    source/ecs/core.cpp
     source/ecs/components/camera.cpp
     source/ecs/components/mesh.cpp
     source/ecs/components/program.cpp
@@ -110,6 +112,7 @@ set(PUBLIC_HEADERS
 )
 
 set(PRIVATE_HEADERS
+    include/nebula/ecs/core.hpp
     include/nebula/resources/meshes.hpp
     include/nebula/resources/shaders.hpp
     include/nebula/events/conversion.hpp
@@ -169,7 +172,6 @@ target_include_directories(nebula
 
 target_link_libraries(nebula
     PRIVATE
-        Threads::Threads
         $<BUILD_INTERFACE:SDL2::SDL2>
         $<BUILD_INTERFACE:OpenGL::OpenGL>
         $<BUILD_INTERFACE:glm::glm-header-only>

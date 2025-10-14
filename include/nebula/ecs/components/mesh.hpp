@@ -12,7 +12,5 @@ struct Mesh {
     Mesh(const std::string_view &name);
 }; // struct Mesh
 
-inline ECSComponentRegisterer<Mesh> meshRegisterer;
-
 } // namespace nebula::data
 

@@ -18,7 +18,5 @@ struct Camera {
 
 struct Active {};
 
-inline ECSComponentRegisterer<Camera> cameraRegisterer;
-
 } // namespace nebula::data
 

@@ -12,7 +12,5 @@ struct Program {
     Program(const std::string_view &name);
 }; // struct Program
 
-inline ECSComponentRegisterer<Program> programRegisterer;
-
 } // namespace nebula::data
 

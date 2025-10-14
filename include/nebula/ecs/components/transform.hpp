@@ -16,7 +16,5 @@ struct Transform {
 
 }; // struct Transform
 
-inline ECSComponentRegisterer<Transform> transformRegisterer;
-
 } // namespace nebula::data
 

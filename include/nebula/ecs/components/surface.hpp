@@ -8,7 +8,5 @@ struct Surface {
     
 }; // struct Surface
 
-inline ECSComponentRegisterer<Surface> surfaceRegisterer;
-
 } // namespace nebula::data
 

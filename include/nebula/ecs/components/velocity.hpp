@@ -12,7 +12,5 @@ struct Velocity {
     Velocity();
 }; // struct Velocity
 
-inline ECSComponentRegisterer<Velocity> velocityRegisterer;
-
 } // namespace nebula::data
 

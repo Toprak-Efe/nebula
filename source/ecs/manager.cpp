@@ -1,36 +1,35 @@
 #include "../../include/nebula/ecs/manager.hpp"
+#include "../../include/nebula/ecs/core.hpp"
 
-using namespace nebula::data;
-    
-ECSManager::ECSManager() :
+nebula::data::ECSManager::ECSManager() :
     m_world()
 {
-
+    m_world.import<nebula::data::core>();
 }
 
-ECSManager& ECSManager::get() {
-    static ECSManager instance;
+nebula::data::ECSManager& nebula::data::ECSManager::get() {
+    static nebula::data::ECSManager instance;
     return instance;
 }
 
-ECSManager::~ECSManager() {
+nebula::data::ECSManager::~ECSManager() {
 
 }
 
-void ECSManager::initialize() {
+void nebula::data::ECSManager::initialize() {
     m_world.set<flecs::Rest>({});
     m_world.import<flecs::stats>();
 }
 
-void ECSManager::progressSystems(float d) {
+void nebula::data::ECSManager::progressSystems(float d) {
     m_world.progress(d);
 }
 
-void ECSManager::registerComponentType() {
+void nebula::data::ECSManager::registerComponentType() {
 
 }
 
-flecs::world &ECSManager::getRegistry() {
+flecs::world &nebula::data::ECSManager::getRegistry() {
     return m_world;
 }
 

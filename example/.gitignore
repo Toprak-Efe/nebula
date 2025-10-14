@@ -1,0 +1,9 @@
+.vscode/
+build/
+.cache/
+__cmake_systeminformation/
+log.txt
+imgui.ini
+CMakeCache.txt
+CMakeFiles
+_deps

@@ -85,12 +85,12 @@ void RenderingManager::renderObjects(const flecs::entity &camera) const {
 }
 
 void RenderingManager::renderSurfaces(flecs::entity &camera) const {
-    data::Transform &trans = camera.get_mut<data::Transform>();
-    data::Camera &cam = camera.get_mut<data::Camera>();
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
+
+    /*data::Transform &trans = camera.get_mut<data::Transform>();
+    data::Camera &cam = camera.get_mut<data::Camera>();
 
     ImGui::Begin("Frame Rate");
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -100,6 +100,7 @@ void RenderingManager::renderSurfaces(flecs::entity &camera) const {
     ImGui::DragFloat3("Camera Pose", &trans.position[0]);
     ImGui::DragFloat("FOV (Degrees)", &cam.arclength);
     ImGui::End();
+    */
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

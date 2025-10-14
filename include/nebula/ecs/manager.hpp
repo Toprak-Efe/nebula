@@ -20,20 +20,5 @@ private:
     flecs::world m_world;
 }; // class ECSManager
 
-template<typename T>
-struct ECSComponentRegisterer {
-    ECSComponentRegisterer() {
-        ECSManager &ecsManager = ECSManager::get();
-        flecs::world &ecs = ecsManager.getRegistry(); 
-        ecs.component<T>();
-    }
-}; // namespace ECSComponentRegisterer
-
-template<typename T>
-struct ECSSystemRegisterer {
-    ECSSystemRegisterer(flecs::system &&sys) {
-    }
-}; // namespace ECSSystemRegisterer
-
 } // namespace nebula::ecs
 
