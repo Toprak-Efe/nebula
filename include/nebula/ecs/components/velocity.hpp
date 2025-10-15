@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../manager.hpp"
 #include "../../utils/math.hpp"
 
 namespace nebula::data {

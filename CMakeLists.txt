@@ -70,7 +70,6 @@ set(SOURCES
     source/main.cpp
     source/utils/functions.cpp
     source/utils/log.cpp
-    source/utils/math.cpp
     source/resources/meshes.cpp
     source/resources/shaders.cpp
     source/events/manager.cpp
@@ -127,7 +126,6 @@ target_sources(nebula
         TYPE HEADERS
         BASE_DIRS "${imgui_SOURCE_DIR}"
         FILES
-            ${imgui_SOURCE_DIR}/imgui.h
             ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.h
             ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.h
     PUBLIC
@@ -188,7 +186,12 @@ install(TARGETS nebula
 )
 
 install(FILES "${flecs_SOURCE_DIR}/distr/flecs.h"
-    DESTINATION include/nebula/ecs
+    DESTINATION include/nebula/
+)
+install(FILES
+    "${imgui_SOURCE_DIR}/imgui.h"
+    "${imgui_SOURCE_DIR}/imconfig.h"
+    DESTINATION include/nebula/
 )
 
 install(EXPORT nebula-targets

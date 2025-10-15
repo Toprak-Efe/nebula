@@ -1,6 +1,5 @@
-#include <random>
-
 #include <nebula/nebula.hpp>
+#include <nebula/imgui.h>
 #include <nebula/utils/conversion.hpp>
 
 #include <glm/ext/quaternion_float.hpp>
@@ -8,9 +7,11 @@
 #include <glm/ext.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
+#include <random>
 
 void nebula::game::initialize(nebula::NebulaApi &api) {
     flecs::world &world = api.ecs->getRegistry();
+
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(-5.0, 5.0);
@@ -28,6 +29,8 @@ void nebula::game::initialize(nebula::NebulaApi &api) {
         cube.add<data::Mesh>();
         cube.set<data::Mesh>({"cube"});
     }
+    
+
     flecs::entity default_camera = world.entity("default_camera");
     default_camera.add<data::Camera>();
     default_camera.set<data::Camera>({1920, 1080, 70.0});
@@ -36,23 +39,24 @@ void nebula::game::initialize(nebula::NebulaApi &api) {
     default_camera.get_mut<data::Transform>().position[2] = 150.0;
     api.events->registerEventCallback(nebula::events::EventType::KeyPressed,
         [&](nebula::events::Event *e) -> bool {
+            flecs::world &world = api.ecs->getRegistry();
             const auto q = world.query<const data::Camera, const data::Active, const data::Transform>(); 
             flecs::entity active_camera = q.first();
             if (!active_camera.is_valid()) {
                 return false;
             }
-            switch (e->keyboard.key_code) {
+            switch ((char) e->keyboard.key_code) {
                 case 'w':    
-                    active_camera.get_mut<data::Transform>().position[2] -= 0.01;
+                    active_camera.get_mut<data::Transform>().position[2] -= 0.5;
                     break;
                 case 's':
-                    active_camera.get_mut<data::Transform>().position[2] += 0.01;
+                    active_camera.get_mut<data::Transform>().position[2] += 0.5;
                     break;
                 case 'a':
-                    active_camera.get_mut<data::Transform>().position[0] += 0.01;
+                    active_camera.get_mut<data::Transform>().position[0] += 0.5;
                     break;
                 case 'd':
-                    active_camera.get_mut<data::Transform>().position[0] -= 0.01;
+                    active_camera.get_mut<data::Transform>().position[0] -= 0.5;
                     break;
             } 
             return true;
@@ -61,6 +65,7 @@ void nebula::game::initialize(nebula::NebulaApi &api) {
     api.events->registerEventCallback(nebula::events::EventType::MouseMoved,
         [&](nebula::events::Event *e) {
             static float sensitivity = 0.01f;
+            flecs::world &world = api.ecs->getRegistry();
             const auto q = world.query<const data::Camera, const data::Active, const data::Transform>(); 
             flecs::entity active_camera = q.first();
             if (!active_camera.is_valid()) {
@@ -78,6 +83,27 @@ void nebula::game::initialize(nebula::NebulaApi &api) {
             return true;
         }
     );
+    flecs::entity surface = world.entity();
+    surface.add<data::Surface>();
+    surface.get_mut<data::Surface>().render = [&]() -> void {
+        flecs::world &world = api.ecs->getRegistry();
+        const auto q = world.query<const data::Camera, const data::Active, const data::Transform>(); 
+        flecs::entity active_camera = q.first();
+        if (!active_camera.is_valid()) {
+            return;
+        }
+        data::Transform &trans = active_camera.get_mut<data::Transform>();
+        data::Camera &cam = active_camera.get_mut<data::Camera>();
+
+        ImGui::Begin("Frame Rate");
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+
+        ImGui::Begin("Camera");
+        ImGui::DragFloat3("Camera Pose", &trans.position[0]);
+        ImGui::DragFloat("FOV (Degrees)", &cam.arclength);
+        ImGui::End();
+    };
     flecs::system gravity = world.system<data::Velocity>("Gravity")
         .each([](flecs::iter &it, size_t, data::Velocity &v) {
             v.positional[1] += -9.81f * it.delta_time(); 

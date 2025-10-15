@@ -1,7 +1,6 @@
 #pragma once 
 
 #include <cstdint>
-#include "../manager.hpp"
 #include "../../utils/math.hpp"
 
 namespace nebula::data {

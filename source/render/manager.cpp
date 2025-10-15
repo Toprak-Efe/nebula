@@ -88,22 +88,16 @@ void RenderingManager::renderObjects(const flecs::entity &camera) const {
 }
 
 void RenderingManager::renderSurfaces(flecs::entity &camera) const {
+    flecs::world world = nebula::data::ECSManager::get().getRegistry();
+    const auto q = world.query<const data::Surface>();
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-
-    /*data::Transform &trans = camera.get_mut<data::Transform>();
-    data::Camera &cam = camera.get_mut<data::Camera>();
-
-    ImGui::Begin("Frame Rate");
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::End();
-
-    ImGui::Begin("Camera");
-    ImGui::DragFloat3("Camera Pose", &trans.position[0]);
-    ImGui::DragFloat("FOV (Degrees)", &cam.arclength);
-    ImGui::End();
-    */
+    
+    q.each([&](flecs::entity e, const data::Surface &s){
+       s.render(); 
+    });
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
