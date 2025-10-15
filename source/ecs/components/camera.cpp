@@ -24,8 +24,9 @@ Camera::Camera(uint16_t width, uint16_t height, float arclength) :
 }
 
 Mat4 Camera::getProjectionMatrix() const {
+    Mat4 out;
     float fov = arclength*std::numbers::pi_v<float>/180.0;
     glm::mat4 pers = glm::perspective(fov, (float) width / (float) height, 0.01f, 10000.0f);
-    Mat4 out = glmToNebula(pers);
+    toNebula(pers, out);
     return out;
 }

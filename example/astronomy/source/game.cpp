@@ -1,7 +1,13 @@
-#include <nebula/events/types.hpp>
 #include <random>
 
 #include <nebula/nebula.hpp>
+#include <nebula/utils/conversion.hpp>
+
+#include <glm/ext/quaternion_float.hpp>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 
 void nebula::game::initialize(nebula::NebulaApi &api) {
     flecs::world &world = api.ecs->getRegistry();
@@ -52,7 +58,7 @@ void nebula::game::initialize(nebula::NebulaApi &api) {
             return true;
         }
     );
-    /*api.events->.registerEventCallback(nebula::events::EventType::MouseMoved,
+    api.events->registerEventCallback(nebula::events::EventType::MouseMoved,
         [&](nebula::events::Event *e) {
             static float sensitivity = 0.01f;
             const auto q = world.query<const data::Camera, const data::Active, const data::Transform>(); 
@@ -61,14 +67,17 @@ void nebula::game::initialize(nebula::NebulaApi &api) {
                 return false;
             }
             data::Transform &t = active_camera.get_mut<data::Transform>();
-            glm::vec3 euler = glm::eulerAngles(t.orientation);
-            euler.x += e->motion.yrel * sensitivity;
-            euler.y += -e->motion.xrel * sensitivity;
-            t.orientation = glm::angleAxis(euler.x, glm::vec3{1, 0, 0});
-            t.orientation *= glm::angleAxis(euler.y, glm::vec3{0, 1, 0});
+            glm::quat orientation;
+            data::fromNebula(t.orientation, orientation);
+            glm::vec3 euler = glm::eulerAngles(orientation);
+            euler.x += e->mouse_motion.y_rel * sensitivity;
+            euler.y += -e->mouse_motion.x_rel * sensitivity;
+            orientation = glm::angleAxis(euler.x, glm::vec3{1, 0, 0});
+            orientation *= glm::angleAxis(euler.y, glm::vec3{0, 1, 0});
+            data::toNebula(orientation, t.orientation);
             return true;
         }
-    );*/
+    );
     flecs::system gravity = world.system<data::Velocity>("Gravity")
         .each([](flecs::iter &it, size_t, data::Velocity &v) {
             v.positional[1] += -9.81f * it.delta_time(); 

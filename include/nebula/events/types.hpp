@@ -3,6 +3,7 @@
 namespace nebula::events {
 
 enum class EventType {
+    MissingEvent,
     WindowClose,
     KeyPressed,
     KeyReleased,

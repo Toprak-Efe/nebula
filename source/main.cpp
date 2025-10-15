@@ -15,7 +15,6 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <flecs.h>
 
-#include "../generated/nebula/version.hpp"
 #include "../include/nebula/ecs/ecs.hpp"
 #include "../include/nebula/resources/shaders.hpp"
 #include "../include/nebula/resources/meshes.hpp"
@@ -41,9 +40,6 @@ using namespace nebula;
 
 int main() {
     Logger &logger = Logger::get();
-    logger.log<Levels::INFO> ("ENTERING {}", version::PROJECT_NAME);
-    logger.log<Levels::INFO> ("{} VERSION {}", version::PROJECT_NAME, version::PROJECT_VERSION);
-    logger.log<Levels::INFO> ("{} BUILD DATE {}", version::PROJECT_NAME, version::PROJECT_BUILD_DATE);
 
     data::ECSManager &ecsManager = data::ECSManager::get();
     events::EventManager &eventManager = events::EventManager::get();
@@ -69,11 +65,9 @@ int main() {
     millisecond t_accumulated{0}; 
 
     std::atomic_bool running = true;
-    //eventManager.registerEventCallback(events::EventType::WindowClose,
-    //     [&](events::Event *) -> bool {
-    //        return false;
-    //    }
-    //);
+    eventManager.registerEventCallback(events::EventType::WindowClose,
+         [&](events::Event *) -> bool { return !((bool) (running = false)); }
+    );
     while (running) {
         millisecond delta = std::chrono::duration_cast<millisecond> (clock::now() - t_last);
         t_last += delta;
@@ -81,10 +75,10 @@ int main() {
 
         SDL_Event sdl_event;
         while (SDL_PollEvent(&sdl_event)) {
+            events::Event nebula_event;
+            events::toNebula(sdl_event, nebula_event); 
             ImGui_ImplSDL2_ProcessEvent(&sdl_event);
-            if (sdl_event.type == SDL_QUIT) running = false;
-            //events::Event event = events::sdl_to_nebula(sdl_event); 
-            //eventManager.processEvent(&event);
+            eventManager.processEvent(&nebula_event);
         }
 
         while (t_accumulated > TIME_PER_TICK) {

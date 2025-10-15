@@ -14,14 +14,6 @@ include(GNUInstallDirs)
 include(GenerateExportHeader)
 include(CMakePackageConfigHelpers)
 
-string(TIMESTAMP TODAY "%d/%m/%Y")
-set(PROJECT_BUILD_DATE ${TODAY})
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.hpp.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/generated/nebula/version.hpp"
-    @ONLY
-)
-
 find_package(OpenGL REQUIRED)
 find_package(Threads REQUIRED)
 
@@ -76,14 +68,12 @@ add_library(nebula::nebula ALIAS nebula)
 
 set(SOURCES
     source/main.cpp
-    source/utils/conversion.cpp
     source/utils/functions.cpp
     source/utils/log.cpp
     source/utils/math.cpp
     source/resources/meshes.cpp
     source/resources/shaders.cpp
     source/events/manager.cpp
-    source/events/conversion.cpp
     source/render/manager.cpp
     source/render/types.cpp
     source/ecs/manager.cpp
@@ -109,6 +99,7 @@ set(PUBLIC_HEADERS
     include/nebula/ecs/components/velocity.hpp
     include/nebula/utils/log.hpp
     include/nebula/utils/math.hpp
+    include/nebula/utils/conversion.hpp
 )
 
 set(PRIVATE_HEADERS
