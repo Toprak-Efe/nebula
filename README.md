@@ -47,6 +47,7 @@ cmake --build build --parallel
 # 4. (Optional) Install the library
 # This will place the library and headers in a system-friendly location
 cmake --build build --target install
+```
 
 ---
 
