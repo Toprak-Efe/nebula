@@ -24,12 +24,12 @@ jobs:
 
     - name: Configure CMake
       env:
-        CC: clang
-        CXX: clang
+        CC: clang-21
+        CXX: clang-21
       run: cmake -S ${{github.workspace}} -B ${{github.workspace}}/build 
 
     - name: Build
       env:
-        CC: clang
-        CXX: clang
+        CC: clang-21
+        CXX: clang-21
       run: cmake --build ${{github.workspace}}/build --parallel 
