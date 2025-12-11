@@ -1,11 +1,19 @@
+#include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <filesystem>
+#include <fstream>
+#include <ranges>
+#include <string_view>
 #include <vector>
+#include <regex>
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <SDL2/SDL_opengl.h>
 
 #include "../../include/nebula/resources/shaders.hpp"
 #include "../../include/nebula/utils/functions.hpp"
+#include "../../include/nebula/utils/path.hpp"
 #include "../../include/nebula/utils/log.hpp"
 
 using namespace nebula::resources;
@@ -35,9 +43,7 @@ Shader::Shader(GLenum type, const std::string_view &src, const GLuint id) :
 }
 
 Shader::~Shader() {
-    if (id) {
-        glDeleteShader(id);
-    }
+    return;
 }
 
 GLuint Shader::getId() const {
@@ -47,6 +53,13 @@ GLuint Shader::getId() const {
 ShaderProgram::ShaderProgram() :
     id(0),
     udict()
+{
+    return;
+}
+
+ShaderProgram::ShaderProgram(const ShaderProgram& other) :
+    id(other.id),
+    udict(other.udict)
 {
     return;
 }
@@ -74,9 +87,7 @@ ShaderProgram::ShaderProgram(const GLuint id, std::map<std::string_view, GLint> 
 
 ShaderProgram::~ShaderProgram() 
 {
-    if (id) {
-        glDeleteProgram(id);
-    }
+    return;
 }
 
 GLuint ShaderProgram::getId() const {
@@ -96,111 +107,78 @@ ShaderManager::ShaderManager() {
     return;
 }
 
+std::optional<ShaderProgram> generateShader(const std::string_view &source, std::string name) {
+    static const std::map<std::string_view, GLenum> shader_type_map{
+        {"vertex",      GL_VERTEX_SHADER},
+        {"geometry",    GL_GEOMETRY_SHADER},
+        {"fragment",    GL_FRAGMENT_SHADER}
+    }; 
+
+    { /* Extract separate subshaders */
+        std::vector <std::pair<GLenum, std::string>> shaders_parsed;
+        shaders_parsed.reserve(3);
+        const std::string_view key = "#shader";
+        size_t cursor = source.find(key);
+        while (cursor != std::string_view::npos) {
+            size_t type_begin = source.find_first_not_of(" \t", cursor + key.size());
+            size_t type_end = source.find_first_of(" \t", type_begin); 
+            std::string_view type_sv = source.substr(type_begin, type_end);
+
+            GLenum shader_type;
+            if (shader_type_map.contains(type_sv)) {
+                shader_type = shader_type_map.at(type_sv);
+            }
+
+            size_t cursor = source.find(key, type_end);
+            std::string_view shader_source = source.substr(type_end, cursor);
+            shaders_parsed.emplace_back(std::pair{shader_type, shader_source}); 
+        }
+    }
+
+    { /* Extract uniform variables */
+        std::vector <std::pair <std::string, std::>> subshader_programs;
+        std::vector <std::pair<GLenum, std::string>> shaders_parsed;
+        shaders_parsed.reserve(3);
+        const std::string_view key = "#shader";
+        size_t cursor = source.find(key);
+        key = "uniform";
+        cursor = source.find()
+    }
+
+    return {};
+};
+
 void ShaderManager::initialize() {
     Logger &logger = Logger::get();
-    std::map<std::string_view, Shader> shaders;
-
-    static std::vector<std::pair<std::string_view, shader_t>> shaderList = {
-        []() consteval {
-            static constexpr char source[] = {
-                #embed "../../shaders/vertex.glsl"
-            };
-            return std::pair{
-                std::string_view{"vertex"},
-                shader_t{GL_VERTEX_SHADER, std::string_view{source, sizeof(source)}}
-            };
-        }(),
-        []() consteval {
-            static constexpr char source[] = {
-                #embed "../../shaders/fragment.glsl"
-            };
-            return std::pair{
-                std::string_view{"vertex"},
-                shader_t{GL_FRAGMENT_SHADER, std::string_view{source, sizeof(source)}}
-            };
-        }(),
-        []() consteval {
-            static constexpr char source[] = {
-                #embed "../../shaders/geometry.glsl"
-            };
-            return std::pair{
-                std::string_view{"geometry"},
-                shader_t{GL_GEOMETRY_SHADER, std::string_view{source, sizeof(source)}}
-            };
-        }(),
+    std::vector<std::pair<std::string, std::string>> shaders_found;
+    
+    const std::string default_source = {
+        #embed "../../shaders/default.glsl"
     };
+    const std::string default_name = "default";
+    shaders_found.emplace_back(default_name, default_source); 
+    
+    std::filesystem::path shaders_path = get_asset_dir() / "shaders";
+    for (const auto &shader_iter : std::filesystem::directory_iterator(shaders_path)) {
+        if (!shader_iter.is_regular_file() || shader_iter.path().extension() != "glsl") continue;
+        logger.log<Levels::INFO>("Found Shader: %s", shader_iter.path().stem().string());
+        
+        std::string shader_name = shader_iter.path().stem();
+        size_t shader_source_size = std::filesystem::file_size(shader_iter.path()); 
+        std::string shader_source(shader_source_size, '\0'); 
 
-    static std::vector<std::pair<std::string_view, std::pair<std::vector<std::string_view>, std::vector<std::string_view>>>> shaderProgramList = {
-        std::pair{
-            std::string_view{"starShader"},
-            std::pair {
-                std::vector<std::string_view>({ 
-                    "vertex",
-                    "fragment",
-                }),
-                std::vector<std::string_view>({
-                    "transformation",
-                    "color"
-                })
-            }
-        }
-    };
-
-    logger.log<nebula::Levels::INFO>("Building shaders.");
-    for (auto &shader : shaderList) {
-        const std::string_view &name = shader.first;
-        const GLenum type = shader.second.type; 
-
-        const std::string_view &source = shader.second.source;
-        GLint source_size = source.length(); 
-
-        GLuint gs = glCreateShader(type);
-        const char *sourcePtr = source.data();
-        glShaderSource(gs, 1, (const GLchar **) &sourcePtr, &source_size);
-        glCompileShader(gs);
-
-        GLint success;
-        glGetShaderiv(gs, GL_COMPILE_STATUS, &success);
-        if (!success) {
-            char info_log[256];
-            glGetShaderInfoLog(gs, sizeof(info_log), NULL, info_log);
-            logger.log<nebula::Levels::INFO>("Shader {} failed to compile. {}", name, info_log);
-        }
-
-        shaders.emplace(name, Shader(type, source, gs));
+        std::ifstream shader_file(shader_iter.path());
+        shader_file.read(&shader_source[0], shader_source_size); 
+        shaders_found.emplace_back(shader_name, shader_source);
     }
 
-    logger.log<nebula::Levels::INFO>("Linking shaders.");
-    for (auto &shaderProgram : shaderProgramList) {
-        GLuint shaderProgramId = glCreateProgram();
-        
-        for (auto &shader : shaderProgram.second.first) {
-            glAttachShader(shaderProgramId, shaders[shader].getId());
-        } 
-        
-        glLinkProgram(shaderProgramId);
-        
-        GLint success;
-        glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &success);
-        if (!success) {
-            char info_log[256];
-            glGetProgramInfoLog(shaderProgramId, sizeof(info_log), NULL, info_log);
-            logger.log<nebula::Levels::INFO>("Shader {} failed to compile. {}", shaderProgram.first, info_log);
-        } else {
-            logger.log<nebula::Levels::INFO>("Shader {} successfully compiled.", shaderProgram.first);
+    std::ranges::for_each(shaders_found, [&](const auto& shader_desc){
+        logger.log<Levels::INFO>("Compiling Shader: %s", shader_desc.first);
+        std::optional<ShaderProgram> program = generateShader(shader_desc.first, shader_desc.second);
+        if (program.has_value()) {
+            m_shader_programs.emplace(shader_desc.first, program.value());
         }
-        
-        m_shader_programs.emplace(shaderProgram.first, ShaderProgram(shaderProgramId));
-        for (auto &uniformName : shaderProgram.second.second) {
-            GLint uId = glGetUniformLocation(shaderProgramId, uniformName.data());
-            m_shader_programs[shaderProgram.first].addUniform(uniformName, uId);
-        }
-    }
-
-    for (const auto& [name, shader] : shaders) {
-        glDeleteShader(shader.getId());
-    }
-
+    });
 }
 
 ShaderManager::~ShaderManager() {
@@ -209,7 +187,7 @@ ShaderManager::~ShaderManager() {
     }
 }
 
-const ShaderProgram &ShaderManager::getProgram(const std::string_view program_name) const {
+const ShaderProgram &ShaderManager::getProgram(const std::string program_name) const {
     assert(m_shader_programs.contains(program_name));
     return m_shader_programs.at(program_name);
 }

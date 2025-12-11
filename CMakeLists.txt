@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(nebula
+project(Nebula
     VERSION 0.0.1
     DESCRIPTION "An ECS based game engine for C++ built with CMake"
     LANGUAGES CXX C
@@ -63,12 +63,13 @@ target_include_directories(imgui_object PRIVATE
 )
 target_link_libraries(imgui_object PUBLIC SDL2::SDL2 OpenGL::OpenGL)
 
-add_library(nebula STATIC)
-add_library(nebula::nebula ALIAS nebula)
+add_library(Nebula STATIC)
+add_library(Nebula::Nebula ALIAS Nebula)
 
 set(SOURCES
     source/main.cpp
     source/utils/functions.cpp
+    source/utils/path.cpp
     source/utils/log.cpp
     source/resources/meshes.cpp
     source/resources/shaders.cpp
@@ -107,10 +108,11 @@ set(PRIVATE_HEADERS
     include/nebula/resources/shaders.hpp
     include/nebula/events/conversion.hpp
     include/nebula/utils/conversion.hpp
+    include/nebula/utils/path.hpp
     include/nebula/utils/functions.hpp
 )
 
-target_sources(nebula
+target_sources(Nebula
     PRIVATE
         ${SOURCES}
         $<TARGET_OBJECTS:flecs_object>
@@ -136,19 +138,19 @@ target_sources(nebula
             ${PUBLIC_HEADERS}
 )
 
-set_target_properties(nebula PROPERTIES
+set_target_properties(Nebula PROPERTIES
     CXX_EXTENSIONS ON
     POSITION_INDEPENDENT_CODE ON
     CMAKE_CXX_VISIBILITY_PRESET hidden
     CMAKE_VISIBILITY_INLINES_HIDDEN ON
 )
 
-generate_export_header(nebula
+generate_export_header(Nebula
     BASE_NAME NEBULA
     EXPORT_FILE_NAME nebula/export.hpp
 )
 
-target_include_directories(nebula
+target_include_directories(Nebula
     PUBLIC
         "$<BUILD_INTERFACE:${imgui_SOURCE_DIR}>"
         "$<BUILD_INTERFACE:${flecs_SOURCE_DIR}/distr>"
@@ -159,7 +161,7 @@ target_include_directories(nebula
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
-target_link_libraries(nebula
+target_link_libraries(Nebula
     PRIVATE
         $<BUILD_INTERFACE:SDL2::SDL2>
         $<BUILD_INTERFACE:OpenGL::OpenGL>
@@ -167,42 +169,42 @@ target_link_libraries(nebula
 )
 
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/nebula-config-version.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/Nebula-config-version.cmake"
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
 configure_package_config_file(
-    "cmake/nebula-config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/nebula-config.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/nebula"
+    "cmake/Nebula-config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/Nebula-config.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Nebula"
 )
 
-install(TARGETS nebula
-    EXPORT nebula-targets
+install(TARGETS Nebula
+    EXPORT Nebula-targets
     FILE_SET public_headers DESTINATION include
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(FILES "${flecs_SOURCE_DIR}/distr/flecs.h"
-    DESTINATION include/nebula/
+    DESTINATION include/Nebula/
 )
 install(FILES
     "${imgui_SOURCE_DIR}/imgui.h"
     "${imgui_SOURCE_DIR}/imconfig.h"
-    DESTINATION include/nebula/
+    DESTINATION include/Nebula/
 )
 
-install(EXPORT nebula-targets
-    FILE nebula-targets.cmake
-    NAMESPACE nebula::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/nebula"
+install(EXPORT Nebula-targets
+    FILE Nebula-targets.cmake
+    NAMESPACE Nebula::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Nebula"
 )
 
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/nebula-config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/nebula-config-version.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/nebula"
+    "${CMAKE_CURRENT_BINARY_DIR}/Nebula-config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/Nebula-config-version.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Nebula"
 )
 

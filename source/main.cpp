@@ -1,7 +1,6 @@
 #include <glm/fwd.hpp>
 #include <atomic>
 #include <cstdlib>
-#include <iterator>
 #include <ratio>
 #include <chrono>
 
