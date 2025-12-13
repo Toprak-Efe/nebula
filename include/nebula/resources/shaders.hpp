@@ -1,32 +1,34 @@
 #pragma once 
 
 #include <GL/gl.h>
-#include <string_view>
+#include <string>
 #include <memory>
 #include <map>
 
 namespace nebula::resources {
 
-struct shader_t {
-    GLenum type;
-    std::string_view source;
-}; // shader_t
+enum ShaderUniformType {
+    FLOAT,
+    INTEGER,
+    VEC3,
+    MAT4 
+}; // sShaderUniformType 
 
 class ShaderProgram {
 public:
     ShaderProgram();
     ShaderProgram(const GLuint id);
-    ShaderProgram(const GLuint id, std::map<std::string_view, GLint> &dict);
+    ShaderProgram(const GLuint id, std::map<std::string, GLint> &dict);
     ShaderProgram(const ShaderProgram& other);
     ShaderProgram(ShaderProgram&& other);
     ~ShaderProgram();
     GLuint getId() const;
-    void addUniform(const std::string_view &str, const GLint val);
-    GLint getUniform(const std::string_view &str) const;
+    void addUniform(const std::string &str, const GLint val);
+    GLint getUniform(const std::string &str) const;
     using Ptr = std::shared_ptr<ShaderProgram>;
 private:
     GLuint id;
-    std::map<std::string_view, GLint> udict;
+    std::map<std::string, GLint> udict;
 }; // ShaderProgram
 
 class ShaderManager {   
